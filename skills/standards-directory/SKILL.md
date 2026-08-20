@@ -1,6 +1,6 @@
 ---
 name: standards-directory
-description: 目录结构设计。读 architecture 的技术选型（docs/standards/tech-stack-rule.md）确定端与技术栈，后端再确认架构风格（DDD/扁平业务切片/薄层垂直切片/其他），按风格与端选择目录设计模板，构造目录设计 prompt 用 subagent 执行，输出目录树到 docs/standards/directory-rule.md + directory-draft.md 并登记 CLAUDE.md 清单。当用户要做目录结构设计、工程骨架、代码组织规划时使用。
+description: 目录结构设计。读 architecture 写入 tech-stack-rule.md 的"选型上下文"（端/技术栈/后端架构风格），展示给用户确认后按端与架构风格选目录模板，构造目录设计 prompt 用 subagent 执行，输出目录树到 docs/standards/directory-rule.md + directory-draft.md 并登记 CLAUDE.md 清单。当用户要做目录结构设计、工程骨架、代码组织规划时使用。
 ---
 
 # standards-directory
@@ -13,30 +13,21 @@ description: 目录结构设计。读 architecture 的技术选型（docs/standa
 - 建议存在：`docs/specs/data/`（DB 设计文件）、`docs/specs/API` 或 `docs/specs/grpc`（已定义接口）、`docs/standards/CLAUDE.md`（约束层约定）。
 - 缺失必选项时，提示先运行对应 skill（architecture / product-business），结束。
 
-## Step 1 — 读 architecture 选择
+## Step 1 — 读 architecture 已记录的选择
 
-读 `docs/standards/tech-stack-rule.md`，确认：
-- **端**：前端 / 后端 / App / 桌面端 / 小程序；
-- **技术栈**：所选语言/框架/中间件。
+读 `docs/standards/tech-stack-rule.md` 顶部的"选型上下文"元信息，提取：**端**、**技术栈**、**后端架构风格**（仅后端）。
+- 若该元信息缺失（旧文件或未记录），用 AskUserQuestion 补问端与（如后端）架构风格。
 
-若 rule 文件缺失这些信息，用 AskUserQuestion 补问。
+## Step 2 — 展示并确认（不重复选择）
 
-## Step 2 — 选目录模板（AskUserQuestion）
+- 向用户展示一行摘要：端、技术栈、（后端）架构风格。
+- 用 AskUserQuestion 确认："按以上选择进行目录设计？"选项：**确认**（推荐）/ **修改**（选 Other 说明改哪项）。
+- 确认后使用记录值；若用户修改，按修改后的值继续。
 
-按端选择模板；**仅后端**额外确认架构风格。
-
-### 2.1 后端架构风格（仅选后端时问）
-
-AskUserQuestion：
-- **扁平业务切片（推荐）**：业务零抽象、基础设施平铺 → `templates/flat-slice-architecture.md`
-- **薄层垂直切片**：中间件/工具层抽象 + 业务平铺 → `templates/flat-slice-architecture.md`（prompt 内注明工具层可保留少量抽象）
-- **标准 DDD**：四层整洁架构 + 限界上下文 → `templates/ddd-architecture.md`
-- 其他（自定义）→ 默认 `flat-slice-architecture.md`
-
-### 2.2 端 → 模板映射
+### 2.1 端 → 模板映射
 
 - 前端 → `templates/frontend-directory.md`
-- 后端 → 按 2.1 选中的模板
+- 后端 → 按架构风格：扁平业务切片 / 薄层垂直切片 → `templates/flat-slice-architecture.md`；标准 DDD → `templates/ddd-architecture.md`；其他 → 默认 flat-slice
 - App → `templates/app-directory.md`
 - 桌面端 → `templates/desktop-directory.md`
 - 小程序 → `templates/miniprogram-directory.md`

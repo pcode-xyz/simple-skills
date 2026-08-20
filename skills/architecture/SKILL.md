@@ -102,7 +102,7 @@ AskUserQuestion：
 
 主流程（subagent 返回后，由主流程写文件）：
 - `mkdir -p docs/standards`；文件已存在先读再合并/询问。
-- 写 `docs/standards/tech-stack-rule.md`：技术栈总览表 + 明确约束（AI 直接照做）。
+- 写 `docs/standards/tech-stack-rule.md`：顶部先写"选型上下文"元信息（**端**、**技术栈概要**、**后端架构风格**，供 standards-directory 读取避免重复选择），再写技术栈总览表 + 明确约束（AI 直接照做）。
 - 写 `docs/standards/tech-stack-draft.md`：每个选型理由 + 替代方案对比表（人工追溯用）。
 - 更新 `docs/standards/CLAUDE.md` 的"当前约束清单"表，补上 tech-stack 行（按 init-docs 的 CLAUDE.md 约定）。
 
