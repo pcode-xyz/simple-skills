@@ -21,14 +21,15 @@ description: 接口用例规约（Use Case Specification，仅后端）。三阶
 
 ## Phase 1 — 生成 UCS（顺序 subagent，逐接口）
 
-### 1.1 盘点接口并排除无关
+### 1.1 盘点接口，生成任务清单
 
-- 列出 `docs/specs/API/` 下所有接口 yaml，报告总数。
+- 列出 `docs/specs/API/` 下所有接口 yaml，**报告总数**。
 - 用 AskUserQuestion 请用户**排除与业务用例无关的文档**，得到待生成清单。
+- 为每个待处理接口生成一个编号任务：`任务N：<模块>.yaml → docs/specs/API-UCS/<模块>.md`，得到**任务清单**。
 
-### 1.2 顺序生成（每个接口一个 subagent，直接落盘）
+### 1.2 逐任务顺序执行（每个任务一个 subagent，直接落盘）
 
-**顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理一个接口文档；等它完成后再处理下一个。**不要并行。** 每个 subagent 产出独立文件，无共享冲突，故**由 subagent 直接写入**。
+按任务清单**顺序**逐一执行：每起一个 subagent 处理一个任务；该任务完成并校验通过后，再处理下一个。**不要并行、不要跳跃。** 每个任务产出独立文件，无共享冲突，故**由 subagent 直接写入**。
 
 主流程在起 subagent **前**先检查目标文件是否已存在：
 - 已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
@@ -51,9 +52,14 @@ description: 接口用例规约（Use Case Specification，仅后端）。三阶
 
 ## Phase 2 — 审查 UCS（顺序 subagent，逐文档）
 
-### 2.1 顺序审查（每个 UCS 文档一个 subagent，直接落盘）
+### 2.1 盘点 UCS 文档，生成任务清单
 
-**顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理 `docs/specs/API-UCS/` 的一个文档；等它完成后再处理下一个。**不要并行。** 每个 subagent 产出独立文件，由 **subagent 直接写入**。
+- 列出 `docs/specs/API-UCS/` 下所有 UCS 文档，**报告总数**。
+- 为每个文档生成一个编号任务：`任务N：<模块>.md → docs/specs/API-UCS-review/<同名>.md`，得到**任务清单**。
+
+### 2.2 逐任务顺序执行（每个任务一个 subagent，直接落盘）
+
+按任务清单**顺序**逐一执行：每起一个 subagent 处理一个任务；该任务完成并校验通过后，再处理下一个。**不要并行、不要跳跃。** 每个任务产出独立文件，由 **subagent 直接写入**。
 
 主流程在起 subagent **前**先检查目标文件是否已存在：
 - 已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
@@ -71,7 +77,14 @@ description: 接口用例规约（Use Case Specification，仅后端）。三阶
 
 ## Phase 3 — 按审查结果修正 UCS（顺序 subagent，直接落盘）
 
-**顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理一份审查报告；等它完成后再处理下一个。**不要并行。** 每个 subagent 产出独立文件，由 **subagent 直接写入**。
+### 3.1 盘点审查报告，生成任务清单
+
+- 列出 `docs/specs/API-UCS-review/` 下所有审查报告，**报告总数**。
+- 为每份报告生成一个编号任务：`任务N：<模块> 审查报告 → 修正 docs/specs/API-UCS/<同名>.md`，得到**任务清单**。
+
+### 3.2 逐任务顺序执行（每个任务一个 subagent，直接落盘）
+
+按任务清单**顺序**逐一执行：每起一个 subagent 处理一个任务；该任务完成并校验通过后，再处理下一个。**不要并行、不要跳跃。** 每个任务产出独立文件，由 **subagent 直接写入**。
 
 每个 subagent 的 prompt 必须**自包含**：
 1. **要读的文件**：该审查报告（`docs/specs/API-UCS-review/<模块>.md`）、对应的 UCS 文档（`docs/specs/API-UCS/<同名>.md`）、必要时 API 文档（`docs/specs/API/<同名>.yaml`）。
