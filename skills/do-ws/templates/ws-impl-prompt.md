@@ -24,7 +24,7 @@
     2. **帧契约以 specs/ws 为准**：方向语义「subscribe = 客户端→服务端（网关接收）」「publish = 服务端→客户端（网关发送）」
     3. 遵守 channel 生命周期（连接 / 收发 / 断线重连）与投递语义（durable/transient、可重放、幂等）
     4. 遵守协议约定：心跳 Ping/Pong、前向兼容（只增字段）、未知 type 忽略、限流
-    5. **数据模型与 docs/specs/data/ 一致**；入队任务按 task-UCS（如涉及）
+    5. **数据模型与 docs/specs/data/ 一致**；入队任务按本 UCS-ws 的「数据要求-涉及的任务」表（如涉及）
     6. 遵守 directory-rule.md 的目录结构
     7. **编译通过即可**：在项目根运行该语言的编译命令（以 tech-stack-rule 为准）
 
