@@ -13,7 +13,7 @@ description: 按 task-UCS 实现异步任务代码并编写测试（执行型，
 
 - `templates/task-impl-prompt.md` → 任务实现 prompt（Glob 定位，不硬编码缓存路径）
 - `templates/task-test-prompt.md` → 任务测试 prompt
-- `templates/task-ucs-to-testing-rule.md` → **task-UCS 转测试提取规范**（核心规范，测试 subagent 必须通读；源自 self-driving-services 项目，已随插件打包）
+- `templates/task-ucs-to-testing-rule.md` → **task-UCS 转测试提取规范**（核心规范，测试 subagent 必须通读；含 §0"按技术推演取惯例"——语言/任务方案/架构按 tech-stack-rule / task-layer-rule / directory-rule 取，不预设 Go/asynq/扁平切片）
 
 ## 前置依赖（先检查，缺失就停）
 
