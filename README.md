@@ -24,7 +24,8 @@ claude plugin install simple@simple
 
 | 命令 | 说明 |
 | --- | --- |
-| `/simple:doc-init` | 初始化项目极简文档结构（docs/README.md） |
+| `/simple:doc-init` | 初始化项目文档目录结构（docs/ 完整子目录树） |
+| `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） |
 
 ## 开发
 
