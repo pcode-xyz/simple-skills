@@ -7,7 +7,7 @@ simple 的个人效率自动化技能集，打包成 Claude Code 插件（market
 方式一：通过 marketplace 安装（推荐，可后续从 GitHub 更新）
 
 ```bash
-claude plugin marketplace add simple-skills
+claude plugin marketplace add <owner>/simple-skills
 claude plugin install simple@simple
 ```
 
