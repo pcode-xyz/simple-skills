@@ -1,0 +1,16 @@
+{
+  "name": "simple",
+  "owner": {
+    "name": "simple"
+  },
+  "description": "simple 的个人效率自动化技能集，作为可安装的 Claude Code 插件。",
+  "plugins": [
+    {
+      "name": "simple",
+      "source": "./",
+      "description": "simple 的个人效率自动化技能：文档结构初始化等。",
+      "category": "productivity",
+      "keywords": ["productivity", "docs", "automation"]
+    }
+  ]
+}

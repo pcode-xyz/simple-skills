@@ -1,0 +1,13 @@
+{
+  "name": "simple",
+  "version": "0.1.0",
+  "description": "simple 的个人效率自动化技能集：文档结构初始化等。",
+  "author": {
+    "name": "simple"
+  },
+  "license": "MIT",
+  "keywords": ["productivity", "docs", "automation"],
+  "skills": [
+    "./skills/doc-init"
+  ]
+}
