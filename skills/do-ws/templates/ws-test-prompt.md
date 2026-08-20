@@ -22,7 +22,7 @@
     - 技术选型：docs/standards/tech-stack-rule.md（语言/测试框架/WS 中间件）
     - 目录结构：docs/standards/directory-rule.md
     - DB 设计：docs/specs/data/（table.sql 或 schema.json）
-    - HTTP 配套：docs/specs/API-UCS/ 与 docs/specs/API/（命令/查询；断线补齐依赖）
+    - HTTP 历史契约：docs/specs/API/<模块>.yaml（**仅断线重连测试需要 HTTP 历史接口契约时**；HTTP 用例规约 API-UCS 不需要）
     - 现有网关源码与测试：按 directory-rule 定位的 WS 网关目录（含 setup_test / TestMain / 测试辅助）
 
     ## 行为约束
