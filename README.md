@@ -18,13 +18,13 @@ claude plugin marketplace add /Users/simple/coding/simple-skills
 claude plugin install simple@simple
 ```
 
-安装后命令前缀为 `simple`，例如 `/simple:doc-init`。
+安装后命令前缀为 `simple`，例如 `/simple:init-docs`。
 
 ## 技能列表
 
 | 命令 | 说明 |
 | --- | --- |
-| `/simple:doc-init` | 初始化项目文档目录结构（docs/ 完整子目录树） |
+| `/simple:init-docs` | 初始化项目文档目录结构（docs/ 完整子目录树） |
 | `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） |
 | `/simple:business-flow` | 基于 sense.md + demo 原型稿，用四色建模法梳理业务流程（business-flow.md） |
 | `/simple:glossary` | 统一语言词汇表：business-flow → glossary.md，subagent 逐页对比 demo，分歧/缺失处理 |

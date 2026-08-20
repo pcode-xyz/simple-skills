@@ -42,7 +42,7 @@ description: 产品思考梳理 + 风格化页面 demo。先通过问答摸清�
 
 - 把收敛结果整理成一份简明摘要，先给用户确认；确认后写入 `docs/product/sense.md`。
 - 若文件已存在，问用户：覆盖 / 备份旧文件后替换 / 保留旧文件另存新文件。
-- `mkdir -p docs/product`（不依赖 doc-init 已跑过）。
+- `mkdir -p docs/product`（不依赖 init-docs 已跑过）。
 - 产品名：若 grill 过程未提及，先问一个工作名。
 
 模板（缺失项标注"待定"）：
