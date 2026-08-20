@@ -22,33 +22,64 @@ claude plugin install simple@simple
 
 ## 技能列表
 
+按流水线阶段分组，命令前缀 `simple`（如 `/simple:init-docs`）。
+
+流水线：**产品思考 → 技术架构与标准 → 数据/接口/协议定义 → 用例规约 → 执行落地 → 质量与部署**
+
+### 产品思考
+
 | 命令 | 说明 |
 | --- | --- |
-| `/simple:init-docs` | 初始化项目文档目录结构（docs/ 完整子目录树） |
 | `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） |
 | `/simple:product-business` | 基于 sense.md + demo 原型稿，用四色建模法梳理业务流程（business-flow.md） |
 | `/simple:product-glossary` | 统一语言词汇表：business-flow → glossary.md，subagent 逐页对比 demo，分歧/缺失处理 |
-| `/simple:specs-db` | 数据库设计：选 DB 类型（推荐），MySQL 9 条规范生成 table.sql，其他 DB 适配 |
-| `/simple:specs-data` | 数据结构定义：可靠性视角识别显式结构（DB JSON/跨接口共享/载荷/外部契约）→ struct.md |
-| `/simple:specs-api` | 接口定义：选 HTTP(OpenAPI3.0 → docs/specs/API/) / gRPC(proto3 → docs/specs/grpc/)；HTTP 再选标准 RESTful 或只用 GET/POST；顺序 subagent 逐页生成，按模块合并 |
-| `/simple:specs-ws` | WS 协议定义（AsyncAPI 2.6，仅后端）：识别实时通道→顺序 subagent 生成 → docs/specs/ws/ |
-| `/simple:ucs-ws` | WS 通道用例规约 WS-UCS（仅后端）：识别通道 + grilling 逐通道探讨→生成 → docs/specs/ws-UCS/ |
-| `/simple:do-ws` | WS 网关编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现 UCS-ws→编译通过，再顺序 subagent 写测试 |
-| `/simple:tdd` | 测试全绿修复：跑全量测试→逐失败修复（修代码不修测试）→重跑→直到全部通过 |
-| `/simple:docker` | Docker 容器化部署：生成 Dockerfile/compose/readme-docker.md，覆盖日志/资源/卷/环境/DB 初始化 |
+
+### 技术架构与标准
+
+| 命令 | 说明 |
+| --- | --- |
 | `/simple:architecture` | 技术选型：选端→选技术栈（带推荐）→后端定架构→构造选型 prompt 输出 tech-stack-rule/draft |
 | `/simple:standards-directory` | 目录结构设计：读 architecture 选型→按架构风格选模板（DDD/扁平切片/MVC/OOP）→输出 directory-rule/draft |
 | `/simple:standards-http` | HTTP handler 请求流转说明（仅后端）：按架构风格选模板，输出 http-handler-rule/draft |
 | `/simple:standards-tools` | 工具层设计（通用）：按端+架构风格选模板，输出 tools-rule/draft |
-| `/simple:do-directory` | 目录脚手架搭建（执行型）：读 standards 文档创建目录树 + 基础文件 |
-| `/simple:do-db` | DB 初始化（仅后端，执行型）：按 specs/data 建库建表，禁 DROP、只建 spec 内的表 |
+| `/simple:standards-task` | 异步任务层选型（仅后端）：候选对比+架构决策 → task-layer-rule/draft |
+
+### 数据 / 接口 / 协议定义
+
+| 命令 | 说明 |
+| --- | --- |
+| `/simple:specs-db` | 数据库设计：选 DB 类型（推荐），MySQL 9 条规范生成 table.sql，其他 DB 适配 |
+| `/simple:specs-data` | 数据结构定义：可靠性视角识别显式结构（DB JSON/跨接口共享/载荷/外部契约）→ struct.md |
+| `/simple:specs-api` | 接口定义：选 HTTP(OpenAPI3.0 → docs/specs/API/) / gRPC(proto3 → docs/specs/grpc/)；HTTP 再选标准 RESTful 或只用 GET/POST；顺序 subagent 逐页生成，按模块合并 |
+| `/simple:specs-ws` | WS 协议定义（AsyncAPI 2.6，仅后端）：识别实时通道→顺序 subagent 生成 → docs/specs/ws/ |
+
+### 用例规约（UCS）
+
+| 命令 | 说明 |
+| --- | --- |
 | `/simple:ucs-api` | 接口用例规约 UCS（仅后端）：顺序 subagent 生成 UCS → API-UCS，再安全审查（6 维度）→ API-UCS-review |
 | `/simple:ucs-page` | 页面用例规约 Page UCS（仅写页面端）：盘点 demo 页面→逐任务 subagent 生成 → page-UCS |
-| `/simple:standards-task` | 异步任务层选型（仅后端）：候选对比+架构决策 → task-layer-rule/draft |
 | `/simple:ucs-task` | 异步任务用例规约 task-UCS（仅后端）：business-flow 梳理 + grilling 逐任务探讨→生成 task-UCS |
-| `/simple:do-task` | 异步任务编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 task-UCS→编译通过，再顺序 subagent 写测试 |
+| `/simple:ucs-ws` | WS 通道用例规约 WS-UCS（仅后端）：识别通道 + grilling 逐通道探讨→生成 → docs/specs/ws-UCS/ |
+
+### 执行落地
+
+| 命令 | 说明 |
+| --- | --- |
+| `/simple:init-docs` | 初始化项目文档目录结构（docs/ 完整子目录树） |
+| `/simple:do-directory` | 目录脚手架搭建（执行型）：读 standards 文档创建目录树 + 基础文件 |
+| `/simple:do-db` | DB 初始化（仅后端，执行型）：按 specs/data 建库建表，禁 DROP、只建 spec 内的表 |
 | `/simple:do-api` | 接口编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 UCS→编译通过，再顺序 subagent 写测试→更新测试脚本 |
+| `/simple:do-task` | 异步任务编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 task-UCS→编译通过，再顺序 subagent 写测试 |
+| `/simple:do-ws` | WS 网关编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现 UCS-ws→编译通过，再顺序 subagent 写测试 |
 | `/simple:do-page` | 页面开发（仅写页面端，执行型）：盘点 page-UCS→顺序 subagent 按公约+demo+API 实现→编译通过 |
+
+### 质量与部署
+
+| 命令 | 说明 |
+| --- | --- |
+| `/simple:tdd` | 测试全绿修复：跑全量测试→逐失败修复（修代码不修测试）→重跑→直到全部通过 |
+| `/simple:docker` | Docker 容器化部署：生成 Dockerfile/compose/readme-docker.md，覆盖日志/资源/卷/环境/DB 初始化 |
 
 ## 开发
 
