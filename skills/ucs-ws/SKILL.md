@@ -1,6 +1,6 @@
 ---
 name: ucs-ws
-description: WS 通道用例规约（WS Use Case Specification，仅后端）。从 specs/ws（AsyncAPI 帧契约）+ business-flow/demo 识别实时通道与帧，用 grilling 模式一个通道一个通道探讨清楚（帧功能/收发语义/投递语义/依赖/边界），每通道探讨达成共识后按 ucs-ws-template.md 生成 WS-UCS 直接写入 docs/specs/UCS-ws/<模块>.md。当用户要做 WS 用例规约、WS-UCS 时使用。
+description: WS 通道用例规约（WS Use Case Specification，仅后端）。从 specs/ws（AsyncAPI 帧契约）+ business-flow/demo 识别实时通道与帧，用 grilling 模式一个通道一个通道探讨清楚（帧功能/收发语义/投递语义/依赖/边界），每通道探讨达成共识后按 ucs-ws-template.md 生成 WS-UCS 直接写入 docs/specs/ws-UCS/<模块>.md。当用户要做 WS 用例规约、WS-UCS 时使用。
 ---
 
 # ucs-ws
@@ -11,7 +11,7 @@ WS 通道用例规约：识别实时通道 → 逐通道探讨清楚 → 生成�
 
 - **仅后端**：读 `docs/standards/tech-stack-rule.md` 的"选型上下文"，若**端 ≠ 后端**，提示此 skill 只服务后端，结束。
 - 必须存在：`docs/specs/ws/`（≥1 个 AsyncAPI yaml，帧契约）、`docs/product/business-flow.md`。
-- 建议存在：`docs/specs/API/` 与 `docs/specs/UCS/`（HTTP 命令/查询配套）、`docs/specs/data/`（落库依据）、`docs/product/demo/`（页面实时交互）；`docs/specs/task-UCS/` **仅当该通道帧由异步任务产生时**才需要。
+- 建议存在：`docs/specs/API/` 与 `docs/specs/API-UCS/`（HTTP 命令/查询配套）、`docs/specs/data/`（落库依据）、`docs/product/demo/`（页面实时交互）；`docs/specs/task-UCS/` **仅当该通道帧由异步任务产生时**才需要。
 - 缺失必选项时，提示先运行对应 skill（specs-ws / product-business），结束。
 
 ## 模板文件（本 skill 自带）
@@ -47,13 +47,13 @@ WS 通道用例规约：识别实时通道 → 逐通道探讨清楚 → 生成�
 - 主流程在起 subagent **前**先检查目标文件是否已存在：已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
 
 每个 subagent 的 prompt 必须**自包含**：
-1. **要读的文件**：WS-UCS 模板（Glob 定位 `templates/ucs-ws-template.md`）、该通道的**通道契约**、`docs/specs/ws/<模块>.yaml`（帧契约）、`docs/product/business-flow.md`、`docs/specs/data/` 下 DB 文件、`docs/specs/API/` 与 `docs/specs/UCS/`（HTTP 配套）；`docs/specs/task-UCS/` **仅当该通道帧由异步任务产生时**才读。
+1. **要读的文件**：WS-UCS 模板（Glob 定位 `templates/ucs-ws-template.md`）、该通道的**通道契约**、`docs/specs/ws/<模块>.yaml`（帧契约）、`docs/product/business-flow.md`、`docs/specs/data/` 下 DB 文件、`docs/specs/API/` 与 `docs/specs/API-UCS/`（HTTP 配套）；`docs/specs/task-UCS/` **仅当该通道帧由异步任务产生时**才读。
 2. **生成要求**：
    - **使用中文**；严格按 `templates/ucs-ws-template.md` 结构逐节填写（通道总览 + 各帧 10 小节 + 模块级技术要点）；空节删除不留空壳；
    - 从通道契约 + AsyncAPI 帧定义提取用例：连接级（建立/重连/错误）与每类帧各占一个用例；主成功场景覆盖"帧收发 → 校验 → DB → 广播/入队"；
    - 帧字段/投递语义对齐 `docs/specs/ws/`；字段对齐 `docs/specs/data/`；
    - 每用例覆盖：参数合法性、业务规则、异常兜底、幂等/有序、投递语义、心跳/限流/前向兼容。
-3. **直接写入**：把 WS-UCS 写入确切路径 `docs/specs/UCS-ws/<模块>.md`（先 `mkdir -p docs/specs/UCS-ws`）；写完后报告写入路径与文件大小。
+3. **直接写入**：把 WS-UCS 写入确切路径 `docs/specs/ws-UCS/<模块>.md`（先 `mkdir -p docs/specs/ws-UCS`）；写完后报告写入路径与文件大小。
 
 主流程（subagent 返回后）：
 - **校验**写入的文件：存在、结构符合模板（通道总览 + 各帧 10 小节 + 技术要点）。异常则让该 subagent 重写或主流程修正。

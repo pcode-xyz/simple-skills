@@ -12,7 +12,7 @@
     >
     > 关联文档：
     > - 帧契约：docs/specs/ws/<模块>.yaml（AsyncAPI）
-    > - HTTP 用例：docs/specs/UCS/<模块>.md（命令/查询）
+    > - HTTP 用例：docs/specs/API-UCS/<模块>.md（命令/查询）
     > - 任务用例：docs/specs/task-UCS/<模块>.md（**仅当该通道帧由异步任务产生时**，如 AI 消息/进度帧）
     > - 数据库：docs/specs/data/（表结构）
     >
@@ -127,7 +127,7 @@
 | 文档 | 关系 |
 |------|------|
 | docs/specs/ws/<模块>.yaml | 帧契约（帧定义与投递语义来源） |
-| docs/specs/UCS/<模块>.md | HTTP 命令/查询，与 WS 广播衔接 |
+| docs/specs/API-UCS/<模块>.md | HTTP 命令/查询，与 WS 广播衔接 |
 | docs/specs/task-UCS/<模块>.md | 异步生成，WS 是广播终端（**仅当该通道是异步任务的广播终端时**） |
 | docs/specs/data/ | 落库依据 |
 

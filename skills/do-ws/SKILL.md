@@ -1,6 +1,6 @@
 ---
 name: do-ws
-description: 按 UCS-ws 实现 WS 网关代码并编写测试（执行型，仅后端，subagent 会写真实代码）。主流程只做编排：盘点 docs/specs/UCS-ws 数量、控制待办；两阶段——先顺序逐一 subagent 实现所有 UCS-ws（握手认证/帧处理/广播/房间管理/跨进程转发，帧契约以 specs/ws 为准、编译通过），再顺序逐一 subagent 为所有 UCS-ws 写测试（方向语义、覆盖矩阵、关键约定→测试编译通过）；最后整体编译并确保测试脚本。当用户要实现 WS 网关代码或写测试时使用。
+description: 按 UCS-ws 实现 WS 网关代码并编写测试（执行型，仅后端，subagent 会写真实代码）。主流程只做编排：盘点 docs/specs/ws-UCS 数量、控制待办；两阶段——先顺序逐一 subagent 实现所有 UCS-ws（握手认证/帧处理/广播/房间管理/跨进程转发，帧契约以 specs/ws 为准、编译通过），再顺序逐一 subagent 为所有 UCS-ws 写测试（方向语义、覆盖矩阵、关键约定→测试编译通过）；最后整体编译并确保测试脚本。当用户要实现 WS 网关代码或写测试时使用。
 ---
 
 # do-ws
@@ -19,13 +19,13 @@ description: 按 UCS-ws 实现 WS 网关代码并编写测试（执行型，仅�
 ## 前置依赖（先检查，缺失就停）
 
 - **仅后端**：读 `docs/standards/tech-stack-rule.md` 的"选型上下文"，若**端 ≠ 后端**，提示此 skill 只服务后端，结束。
-- 必须存在：`docs/specs/UCS-ws/`（≥1 个 UCS-ws）、`docs/specs/ws/`（帧契约）。
-- 建议存在：`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/specs/data/`、`docs/specs/API/` 与 `docs/specs/UCS/`（HTTP 配套）。
+- 必须存在：`docs/specs/ws-UCS/`（≥1 个 UCS-ws）、`docs/specs/ws/`（帧契约）。
+- 建议存在：`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/specs/data/`、`docs/specs/API/` 与 `docs/specs/API-UCS/`（HTTP 配套）。
 - 缺失必选项时，提示先运行对应 skill（specs-ws / ucs-ws），结束。
 
 ## Step 1 — 盘点 UCS-ws，生成待办/任务清单（主流程只做编排）
 
-- 列出 `docs/specs/UCS-ws/` 下所有 UCS-ws 文件，**报告总数**。
+- 列出 `docs/specs/ws-UCS/` 下所有 UCS-ws 文件，**报告总数**。
 - 用 AskUserQuestion 请用户**排除无需实现/测试的 UCS**（如预留、仅占位）。
 - 为每个待处理 UCS-ws 登记**两个待办/任务**：`任务N：<模块>.md → 实现` 与 `任务N'：<模块>.md → 测试`。
 - 得到**任务清单**：实现任务（Step 2 用）与测试任务（Step 3 用）**分开登记、各自逐一跟进**。

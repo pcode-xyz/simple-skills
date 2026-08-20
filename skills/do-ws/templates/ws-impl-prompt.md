@@ -9,13 +9,13 @@
 
     ## 项目信息（本任务只读这些文件）
 
-    - 本 UCS-ws：docs/specs/UCS-ws/<模块>.md
+    - 本 UCS-ws：docs/specs/ws-UCS/<模块>.md
     - 帧契约：docs/specs/ws/<模块>.yaml（AsyncAPI；**方向语义以它为准**）
     - 技术选型：docs/standards/tech-stack-rule.md（WS 中间件/编译命令）
     - 目录结构：docs/standards/directory-rule.md（WS 网关目录，不预设为 cmd/ws）
     - 工具层：docs/standards/tools-rule.md
     - DB 设计：docs/specs/data/（table.sql 或 schema.json）
-    - HTTP 配套：docs/specs/API/ 与 docs/specs/UCS/（命令/查询；断线补齐依赖）
+    - HTTP 配套：docs/specs/API/ 与 docs/specs/API-UCS/（命令/查询；断线补齐依赖）
     - 现有源码：WS 网关目录下对应模块
 
     ## 任务要求
