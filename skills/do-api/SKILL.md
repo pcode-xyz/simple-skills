@@ -1,6 +1,6 @@
 ---
 name: do-api
-description: 按 API-UCS 实现后端接口代码（执行型，仅后端，subagent 会在项目里写真实代码）。主流程只做编排：盘点 docs/specs/API-UCS 数量、控制待办任务、最后整体编译；具体实现由顺序逐一 subagent 各自读取 spec 完成（路由对齐 API、models 对齐 DB、按需开发 tools、单任务编译通过）。当用户要真正实现接口代码时使用。
+description: 按 API-UCS 实现后端接口代码（执行型，仅后端，subagent 会在项目里写真实代码）。主流程只做编排：盘点 docs/specs/API-UCS 数量、控制待办任务、最后整体编译；具体实现由顺序逐一 subagent 各自读取 spec 完成（路由对齐 API、数据模型对齐 DB、按需开发 tools、单任务编译通过）。当用户要真正实现接口代码时使用。
 ---
 
 # do-api
@@ -26,7 +26,7 @@ description: 按 API-UCS 实现后端接口代码（执行型，仅后端，suba
 
 ## Step 2 — 逐任务顺序执行（每任务一个 subagent，直接写码）
 
-按任务清单**顺序**逐一执行：每起一个 subagent 实现一个 UCS；该任务完成（subagent 报告编译通过）后再处理下一个。**不要并行、不要跳跃**（共享文件 router.go / go.mod / models 靠顺序执行避免冲突）。
+按任务清单**顺序**逐一执行：每起一个 subagent 实现一个 UCS；该任务完成（subagent 报告编译通过）后再处理下一个。**不要并行、不要跳跃**——路由注册、依赖清单、数据模型等**共享文件**（具体文件名以所选技术栈 / 目录结构为准，不要预设为某语言）靠顺序执行避免冲突。
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/api-impl-prompt.md` 模板，Glob 定位）：
 - **由 subagent 自己读**：本 UCS + tech-stack-rule（语言/编译命令）+ directory-rule + http-handler-rule + tools-rule + docs/specs/data + 同名 API。
