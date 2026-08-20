@@ -1,9 +1,9 @@
 ---
-name: api
+name: specs-api
 description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准 RESTful 或只用 GET/POST，按统一 code/data/message 规范，用顺序 subagent 逐页从 demo 页面生成接口，按模块增量合并到 docs/specs/API/模块.yaml（gRPC → docs/specs/grpc/模块.proto）。当用户要做接口设计、API 定义、OpenAPI 文档、proto 定义时使用。
 ---
 
-# api
+# specs-api
 
 接口定义：从产品原型与业务流程生成接口文档。
 
