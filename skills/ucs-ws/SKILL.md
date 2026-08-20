@@ -11,7 +11,7 @@ WS 通道用例规约：识别实时通道 → 逐通道探讨清楚 → 生成�
 
 - **仅后端**：读 `docs/standards/tech-stack-rule.md` 的"选型上下文"，若**端 ≠ 后端**，提示此 skill 只服务后端，结束。
 - 必须存在：`docs/specs/ws/`（≥1 个 AsyncAPI yaml，帧契约）、`docs/product/business-flow.md`。
-- 建议存在：`docs/specs/API/` 与 `docs/specs/UCS/`（HTTP 命令/查询配套）、`docs/specs/task-UCS/`（异步任务配套）、`docs/specs/data/`（落库依据）、`docs/product/demo/`（页面实时交互）。
+- 建议存在：`docs/specs/API/` 与 `docs/specs/UCS/`（HTTP 命令/查询配套）、`docs/specs/data/`（落库依据）、`docs/product/demo/`（页面实时交互）；`docs/specs/task-UCS/` **仅当该通道帧由异步任务产生时**才需要。
 - 缺失必选项时，提示先运行对应 skill（specs-ws / product-business），结束。
 
 ## 模板文件（本 skill 自带）
@@ -47,7 +47,7 @@ WS 通道用例规约：识别实时通道 → 逐通道探讨清楚 → 生成�
 - 主流程在起 subagent **前**先检查目标文件是否已存在：已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
 
 每个 subagent 的 prompt 必须**自包含**：
-1. **要读的文件**：WS-UCS 模板（Glob 定位 `templates/ucs-ws-template.md`）、该通道的**通道契约**、`docs/specs/ws/<模块>.yaml`（帧契约）、`docs/product/business-flow.md`、`docs/specs/data/` 下 DB 文件、`docs/specs/API/` 与 `docs/specs/UCS/`（HTTP 配套）、`docs/specs/task-UCS/`（异步配套）。
+1. **要读的文件**：WS-UCS 模板（Glob 定位 `templates/ucs-ws-template.md`）、该通道的**通道契约**、`docs/specs/ws/<模块>.yaml`（帧契约）、`docs/product/business-flow.md`、`docs/specs/data/` 下 DB 文件、`docs/specs/API/` 与 `docs/specs/UCS/`（HTTP 配套）；`docs/specs/task-UCS/` **仅当该通道帧由异步任务产生时**才读。
 2. **生成要求**：
    - **使用中文**；严格按 `templates/ucs-ws-template.md` 结构逐节填写（通道总览 + 各帧 10 小节 + 模块级技术要点）；空节删除不留空壳；
    - 从通道契约 + AsyncAPI 帧定义提取用例：连接级（建立/重连/错误）与每类帧各占一个用例；主成功场景覆盖"帧收发 → 校验 → DB → 广播/入队"；
