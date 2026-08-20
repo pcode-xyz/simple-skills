@@ -33,7 +33,7 @@ description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准
 - 每个接口**严格 OpenAPI 3.0** 格式。
 - **统一返回结构**：`{ code, data, message }`——`code=0` 成功、`data` 为具体返回值；`code≠0` 失败、`message` 为错误原因。在 `components/schemas` 定义共享 envelope，每个接口响应用它组合出具体 `data` 结构（可用 `allOf`）。
 - **字段对齐 DB**：接口字段名/类型参考 `docs/specs/data/table.sql` 的字段（以 glossary 英文为基准）。
-- **server**：`servers: [{ url: https://api.yiqiyo.com }]`，路径不含 `/api` 前缀。
+- **server**：`servers` 的 url 由用户设置，默认 `http://127.0.0.1`（若用户给了域名则用用户的）；开始生成前与用户确认一次。路径不含 `/api` 前缀。
 - **每个接口必须给出请求与输出样例**：requestBody 带 `examples`，response 带 `examples`。
 
 ### 3A. 只用 GET/POST（简化风格）
