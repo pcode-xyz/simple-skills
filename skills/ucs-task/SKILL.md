@@ -62,4 +62,4 @@ description: 异步任务用例规约（Task Use Case Specification，仅后端�
 ## 完成后
 
 - 报告：每个任务的探讨结论摘要 + 生成的 task-UCS 清单。
-- 提示：task-UCS 可对接 `do-api` 的任务实现与测试。
+- 提示：task-UCS 可对接 `do-task` 的异步任务实现与测试。
