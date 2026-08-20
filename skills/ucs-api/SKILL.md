@@ -1,6 +1,6 @@
 ---
 name: ucs-api
-description: 接口用例规约（Use Case Specification，仅后端）。三阶段：①顺序 subagent 逐一读 docs/specs/API 生成 UCS 到 docs/specs/API-UCS；②顺序 subagent 逐一做 6 维度安全审查到 docs/specs/API-UCS-review；③逐项做采纳决策（处理决定标记进审查报告）并按决定修正 UCS。当用户要做接口用例规约、UCS、安全审查时使用。
+description: 接口用例规约（Use Case Specification，仅后端）。三阶段：①顺序 subagent 逐一读 docs/specs/API 生成 UCS 到 docs/specs/API-UCS；②顺序 subagent 逐一做 6 维度安全审查到 docs/specs/API-UCS-review；③顺序 subagent 读审查报告自行评估并按推荐修正 UCS。当用户要做接口用例规约、UCS、安全审查时使用。
 ---
 
 # ucs-api
@@ -69,30 +69,22 @@ description: 接口用例规约（Use Case Specification，仅后端）。三阶
 主流程（subagent 返回后）：
 - **校验**写入的文件：存在、结构符合审查模板（S/M/L 问题清单 + 6 维度分析）。异常则让该 subagent 重写或主流程修正。
 
-## Phase 3 — 采纳决策与修正 UCS
-
-### 3.1 逐项做采纳决策
-
-对 `docs/specs/API-UCS-review/` 中每个审查报告：
-- 把该报告的问题清单（S/M/L）呈现给用户；
-- 用 AskUserQuestion **逐项确认**：**采纳**（修复 UCS）/ **不采纳**（保持，注明理由）/ **部分采纳**（按用户说明改）。
-- 注意 AskUserQuestion 一次最多 4 问，问题多时分多轮。
-- 把决定**标记进审查报告**：在每个问题条目下追加一行 `处理决定：采纳 / 不采纳（理由）`。
-- 无问题的维度（"已检查，未发现明显问题"）无需决策。
-
-### 3.2 按决定修正 UCS（顺序 subagent，直接落盘）
+## Phase 3 — 按审查结果修正 UCS（顺序 subagent，直接落盘）
 
 **顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理一份审查报告；等它完成后再处理下一个。**不要并行。** 每个 subagent 产出独立文件，由 **subagent 直接写入**。
 
 每个 subagent 的 prompt 必须**自包含**：
-1. **要读的文件**：该审查报告（`docs/specs/API-UCS-review/<模块>.md`，含处理决定）、对应的 UCS 文档（`docs/specs/API-UCS/<同名>.md`）、必要时 API 文档（`docs/specs/API/<同名>.yaml`）。
-2. **修正要求**：**使用中文**；按审查报告中**处理决定 = 采纳**的条目逐一修正 UCS 对应小节；**不采纳**的条目不改 UCS；修正后整体仍符合 `templates/ucs-template.md` 结构。
-3. **直接写入**：写回 `docs/specs/API-UCS/<同名>.md`（先 `mkdir -p`）；报告修改了哪些用例小节。
+1. **要读的文件**：该审查报告（`docs/specs/API-UCS-review/<模块>.md`）、对应的 UCS 文档（`docs/specs/API-UCS/<同名>.md`）、必要时 API 文档（`docs/specs/API/<同名>.yaml`）。
+2. **修正要求**：
+   - **使用中文**；阅读审查报告后**自行评估**每个问题（S/M/L）的合理性与修复必要性；
+   - **按推荐修正**：合理的（尤其 S/M）逐一修正 UCS 对应小节；轻微 / 不适用 / 与事实不符的可跳过并说明理由；
+   - 修正后整体仍符合 `templates/ucs-template.md` 结构。
+3. **直接写入**：写回 `docs/specs/API-UCS/<同名>.md`（先 `mkdir -p`）；报告修正了哪些用例小节、跳过了哪些及理由。
 
 主流程（subagent 返回后）：
-- **校验**：文件存在、结构仍符合模板；核对采纳条目已修正、不采纳条目未被动。
+- **校验**：文件存在、结构仍符合模板。
 
 ## 完成后
 
-- 报告：生成 / 审查 / 修正的文件清单，以及各审查报告被采纳 / 不采纳的问题数。
+- 报告：生成 / 审查 / 修正的文件清单。
 - 提示：被修正的 UCS（尤其严重问题）可再跑一次 Phase 2 复审。
