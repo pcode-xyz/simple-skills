@@ -1,6 +1,6 @@
 ---
 name: standards-task
-description: 异步任务层技术选型（仅后端）。读 architecture 选型（tech-stack-rule.md）+ 目录/工具层/handler流转，构造"异步任务方案对比"prompt 用 subagent 直接落盘，输出 docs/standards/task-layer-rule.md + task-layer-draft.md 并登记 CLAUDE.md 清单。当用户要做异步任务、消息队列、后台任务、定时任务的选型时使用。
+description: 异步任务层技术选型（仅后端）。读 architecture 选型（tech-stack-rule.md）+ 目录/工具层/handler流转，按模板直接分析并落盘 docs/standards/task-layer-rule.md + task-layer-draft.md，登记 CLAUDE.md 清单。当用户要做异步任务、消息队列、后台任务、定时任务的选型时使用。
 ---
 
 # standards-task
@@ -32,26 +32,23 @@ description: 异步任务层技术选型（仅后端）。读 architecture 选�
 - 展示一行摘要：端=后端 / 语言 / 目录结构来源 / 识别到的异步候选场景。
 - 用 AskUserQuestion 确认："按以上生成异步任务选型？"选项：**确认**（推荐）/ **修改**（选 Other 说明改哪项）。
 
-## Step 3 — 构造选型 prompt 并执行（subagent，直接落盘）
+## Step 3 — 直接分析并落盘（无需 subagent，独立小任务）
 
-### 3.1 构造 prompt
+### 3.1 读取执行指南
 
-- 用 **Glob 定位并读取** `templates/task-selection-prompt.md`，替换 `{语言}`（从 Step 1 取）。
-- prompt 必须**自包含**（subagent 不继承父级规范）。
+- 用 **Glob 定位并读取** `templates/task-selection-prompt.md`，替换 `{语言}`（从 Step 1 取），得到本次分析要求。
 
-### 3.2 执行（subagent）
+### 3.2 主流程直接执行
 
-用 Agent 工具起一个 subagent（prompt 用 3.1 构造好的完整内容）：
-1. **要读的文件**：`docs/product/business-flow.md`、`docs/standards/tech-stack-rule.md`、`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/standards/http-handler-rule.md`。
-2. **执行**：按模板做问题背景 / 候选对比 / 架构决策 / 最佳实践 / 迁移风险分析；**直接落盘**两个文件：
+按模板的分析要求**由主流程自行完成**（不另起 subagent）：
+
+1. **读输入**：`docs/product/business-flow.md`、`docs/standards/tech-stack-rule.md`、`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/standards/http-handler-rule.md`。
+2. **分析**：问题背景（现状 + 需求）→ 候选方案对比（候选表 + 排除分析 + 选型理由）→ 架构设计决策 → 最佳实践 → 迁移风险。
+3. **直接落盘**两个文件：
    - `docs/standards/task-layer-rule.md`（约束，AI 照做）
    - `docs/standards/task-layer-draft.md`（分析，人工追溯）
    （先 `mkdir -p docs/standards`；文件已存在先读再问：覆盖 / 备份后替换 / 跳过。）
-3. **行为约束**：只创建/修改上述两个文件；报告写入路径与文件大小。
-
-主流程（subagent 返回后）：
-- **校验**：两个文件存在、rule 含约束要素、draft 含方案对比。
-- 更新 `docs/standards/CLAUDE.md` 的"当前约束清单"表，补上 task-layer 行。
+4. 更新 `docs/standards/CLAUDE.md` 的"当前约束清单"表，补上 task-layer 行。
 
 ## 完成后
 
