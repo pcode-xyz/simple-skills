@@ -1,9 +1,9 @@
 ---
-name: db
+name: specs-db
 description: 数据库设计。基于 docs/product/business-flow.md 业务描述、docs/product/demo/ 页面、docs/product/glossary.md 字段英文名，先让用户选择 DB 类型（你来推荐），再按所选 DB 生成数据设计，默认 MySQL 输出 docs/specs/data/table.sql。当用户要做数据库设计、建表、schema 设计时使用。
 ---
 
-# db
+# specs-db
 
 数据库设计：根据业务描述与原型稿设计数据层，输出建库脚本/结构。
 
