@@ -16,7 +16,7 @@ description: 接口定义。先让用户选 HTTP(OpenAPI 3.0) 还是 gRPC(proto3
 ## Step 1 — 选协议（AskUserQuestion）
 
 - **HTTP**（默认推荐）：OpenAPI 3.0，输出 `docs/specs/API/模块.yaml`
-- **gRPC**：proto3，输出 `docs/specs/API-UCS/模块.proto`
+- **gRPC**：proto3，输出 `docs/specs/grpc/模块.proto`
 
 ## Step 2 — 通用规范（HTTP）
 
@@ -48,7 +48,7 @@ description: 接口定义。先让用户选 HTTP(OpenAPI 3.0) 还是 gRPC(proto3
 
 ## Step 4 — gRPC 适配（基于上面"看着改"）
 
-- 输出 proto3 到 `docs/specs/API-UCS/模块.proto`（如 `trip.proto`、`user.proto`）。
+- `mkdir -p docs/specs/grpc`，输出 proto3 到 `docs/specs/grpc/模块.proto`（如 `trip.proto`、`user.proto`）。
 - service 方法按 `模块/操作` 语义命名（如 `rpc TripCreate`），message 字段用 glossary/DB 英文。
 - 统一返回：定义公共 `ApiResponse`（`int32 code; string message;` + data），按模块复用。
 - 同样遵守：中文注释、非 0 code 表示失败、样例注释给出请求/响应示例、按模块分文件增量合并。
