@@ -65,4 +65,4 @@ description: 构建统一语言词汇表。基于 docs/product/business-flow.md 
 ## 完成后
 
 - 报告三个文件路径与状态：glossary.md（基础 + 补充 + 已采纳）、glossary-different.md（分歧项 + 采纳结果）。
-- 提示可基于词汇表推进 specs 设计。
+- 提示下一步：运行 `specs-api` 定义接口（字段名用词汇表英文）。

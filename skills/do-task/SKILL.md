@@ -58,4 +58,4 @@ description: 按 task-UCS 实现异步任务代码并编写测试（执行型，
 ## 完成后
 
 - 报告：实现的 task-UCS 清单 + 测试清单（待办逐项状态）、整体编译结果。
-- 提示：可运行测试脚本（如 `make test-unit`）验证，或继续 `ucs-task` / `do-api` 下一轮迭代。
+- 提示：可运行测试脚本（如 `make test-unit`）验证；下一步运行 `tdd` 跑到全绿。

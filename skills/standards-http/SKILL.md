@@ -56,4 +56,4 @@ HTTP handler 说明：给一个完整请求从 HTTP Handler/Controller 到数据
 ## 完成后
 
 - 报告 `docs/standards/http-handler-rule.md` 与 `http-handler-draft.md` 路径。
-- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单。
+- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单；下一步运行 `standards-tools` 设计工具层。

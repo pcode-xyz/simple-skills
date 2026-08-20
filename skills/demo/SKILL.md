@@ -125,4 +125,5 @@ description: 产品思考梳理 + 风格化页面 demo。先通过问答摸清�
 ## 完成后
 
 - 报告 `docs/product/sense.md` 与 `docs/product/demo/index.html` 路径，提示用户在浏览器打开对比页查看。
+- 提示下一步：后端视角运行 `product-business` 梳理业务流程；前端视角运行 `ucs-page` → `do-page`。
 - 询问是否需要调整风格、增删页面或修改内容，可迭代。

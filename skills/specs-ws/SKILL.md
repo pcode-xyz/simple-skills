@@ -49,4 +49,4 @@ WebSocket 协议定义：识别实时通道 → 逐模块生成 AsyncAPI 2.6 yam
 ## 完成后
 
 - 报告：生成 / 跳过 / 覆盖的 WS yaml 清单。
-- 提示：WS 协议可对接 `ucs-api` / `do-api` 的实时部分实现。
+- 提示下一步：运行 `ucs-ws` 生成 WS 通道用例规约。

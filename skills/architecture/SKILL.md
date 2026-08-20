@@ -109,4 +109,4 @@ AskUserQuestion：
 ## 完成后
 
 - 报告 `docs/standards/tech-stack-rule.md` 与 `tech-stack-draft.md` 路径。
-- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单。
+- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单；下一步运行 `standards-directory` 设计目录结构。

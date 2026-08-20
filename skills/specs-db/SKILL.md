@@ -90,4 +90,4 @@ description: 数据库设计。基于 docs/product/business-flow.md 业务描述
 ## 完成后
 
 - 报告输出文件路径、表（或集合）清单。
-- 提示可对照 business-flow.md 的"关键追溯点（足迹锚点）"检查核心数据锚点是否都已覆盖。
+- 提示下一步：运行 `specs-data` 定义显式数据结构（DB JSON / 跨接口共享）。

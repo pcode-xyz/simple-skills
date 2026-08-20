@@ -94,4 +94,4 @@ description: 基于 docs/product/sense.md 与 docs/product/demo/ 原型稿，用
 ## 完成后
 
 - 报告 `docs/product/business-flow.md` 路径。
-- 若用户下一步要做数据/接口设计，提示可基于"关键追溯点"继续（对应 docs/specs/ 目录）。
+- 提示下一步：运行 `product-glossary` 统一术语（供 specs-* 字段命名）。

@@ -60,4 +60,4 @@ description: 工具层设计（通用，任何端/任何架构方式都有工具
 ## 完成后
 
 - 报告 `docs/standards/tools-rule.md` 与 `tools-draft.md` 路径。
-- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单。
+- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单；下一步（如需）运行 `standards-task` 选型异步任务，否则 `do-directory` 搭骨架。

@@ -59,4 +59,4 @@ description: 目录结构设计。读 architecture 写入 tech-stack-rule.md 的
 ## 完成后
 
 - 报告 `docs/standards/directory-rule.md` 与 `directory-draft.md` 路径。
-- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单。
+- 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单；下一步运行 `standards-http` 说明 handler 流转。
