@@ -11,7 +11,7 @@ description: 异步任务层技术选型（仅后端）。读 architecture 选�
 
 - **仅后端**：读 `docs/standards/tech-stack-rule.md` 的"选型上下文"，若**端 ≠ 后端**，提示此 skill 只服务后端，结束。
 - 必须存在：`docs/standards/tech-stack-rule.md`（含后端语言）、`docs/standards/directory-rule.md`（目录结构）。
-- 建议存在：`docs/standards/tools-rule.md`（工具层）、`docs/standards/http-handler-rule.md`（handler 流转）、`docs/product/business-flow.md`（异步候选场景）、`docs/standards/CLAUDE.md`（约束层约定）。
+- 建议存在：`docs/standards/tools-rule.md`（工具层）、`docs/product/business-flow.md`（异步候选场景）、`docs/standards/CLAUDE.md`（约束层约定）。
 - 缺失必选项时，提示先运行对应 skill（architecture / standards-directory），结束。
 
 ## 模板文件（本 skill 自带）
@@ -24,7 +24,6 @@ description: 异步任务层技术选型（仅后端）。读 architecture 选�
 - `tech-stack-rule.md`：后端**语言**、异步相关中间件（如已选 Redis/队列）。
 - `directory-rule.md`：目录结构（task 层将落在哪）。
 - `tools-rule.md`：工具层（异步任务依赖的工具）。
-- `http-handler-rule.md`：handler 流转（哪些 handler 会入队）。
 - `business-flow.md`：识别异步候选场景（外部 AI 调用、通知、耗时计算、定时任务）。
 
 ## Step 2 — 展示并确认（不重复选择）
@@ -42,7 +41,7 @@ description: 异步任务层技术选型（仅后端）。读 architecture 选�
 
 按模板的分析要求**由主流程自行完成**（不另起 subagent）：
 
-1. **读输入**：`docs/product/business-flow.md`、`docs/standards/tech-stack-rule.md`、`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/standards/http-handler-rule.md`。
+1. **读输入**：`docs/product/business-flow.md`、`docs/standards/tech-stack-rule.md`、`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`。
 2. **分析**：问题背景（现状 + 需求）→ 候选方案对比（候选表 + 排除分析 + 选型理由）→ 架构设计决策 → 最佳实践 → 迁移风险。
 3. **直接落盘**两个文件：
    - `docs/standards/task-layer-rule.md`（约束，AI 照做）

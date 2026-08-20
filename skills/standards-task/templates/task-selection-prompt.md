@@ -13,7 +13,6 @@
     - 技术选型：docs/standards/tech-stack-rule.md
     - 目录结构：docs/standards/directory-rule.md
     - 工具层：docs/standards/tools-rule.md
-    - handler 流转：docs/standards/http-handler-rule.md
 
     ## 分析要求
 
