@@ -10,10 +10,10 @@
 
     ## 核心规范（务必通读）
 
-    按本 skill 自带模板 `templates/task-ucs-to-testing-rule.md`（Glob 定位）执行：
-    - §0 按技术推演取惯例（任务入口调用 / 语言惯例 / 目录 / 竞态检测）
-    - §二~§三 从 task-UCS 提取测试场景（Happy / Branch / Negative / Rule / Concurrency / 纯函数 / 广播）
-    - §四 覆盖矩阵、§五 测试类型选择、§六 Mock 策略、§七 文件与命名规范
+    按本 skill 自带模板 `templates/task-ucs-to-testing-rule.md`（Glob 定位）执行，依次覆盖其以下各章：
+    - 「〇、按技术推演取惯例」：任务入口调用 / 语言惯例 / 目录 / 竞态检测
+    - 「二、task-UCS 文档结构」与「三、提取规则」：从 task-UCS 提取测试场景（Happy / Branch / Negative / Rule / Concurrency / 纯函数 / 广播）
+    - 「四、测试覆盖矩阵」「五、测试类型选择」「六、Mock 策略」「七、测试文件与命名规范」
 
     ## 项目信息（本任务只读这些文件）
 
