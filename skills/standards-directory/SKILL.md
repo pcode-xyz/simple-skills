@@ -15,7 +15,7 @@ description: 目录结构设计。读 architecture 的技术选型（docs/standa
 
 ## Step 1 — 读 architecture 选择
 
-读 `docs/standards/tech-stack-rule.md`（必要时补读 `tech-stack-draft.md`），确认：
+读 `docs/standards/tech-stack-rule.md`，确认：
 - **端**：前端 / 后端 / App / 桌面端 / 小程序；
 - **技术栈**：所选语言/框架/中间件。
 
