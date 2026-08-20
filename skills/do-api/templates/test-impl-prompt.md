@@ -1,6 +1,7 @@
 # 测试编写（subagent prompt 模板）
 
 > 每个 UCS 一个 subagent。语言 / 测试框架 / 依赖管理由 subagent 自己从 tech-stack-rule 读取，主流程不注入。
+> **先确认语言与测试框架，按下表取该语言的惯例；未列出的语言按其生态惯例。**
 
 ## prompt 模板
 
@@ -25,7 +26,7 @@
     - 业务规则 → 规则验证测试（Business Rule Tests）
     - 并发与异步设计 → 并发安全测试（Concurrency Tests）
 
-    ## 测试类型选择（语言无关逻辑；工具按语言取）
+    ## 测试类型选择（语言无关逻辑）
 
     | 业务特征 | 测试类型 |
     | 纯函数（tools/middleware） | 单元测试 |
@@ -34,14 +35,21 @@
     | 权限校验、状态流转 | E2E 测试 |
     | 参数校验、输入安全 | E2E 测试 |
 
-    （测试工具按语言生态取：Go 常见 testcontainers-go / httptest / testify / go-sqlmock / go-cmp；其他语言按其主流测试框架）
+    ## 测试工具（按所选语言/框架取；框架以 tech-stack-rule 为准）
 
-    ## 测试文件与命名规范（按语言惯例）
+    | 语言 | 单元 | Mock | 集成/DB | E2E/HTTP |
+    | Go | testify、go-cmp | go-sqlmock、go.uber.org/mock | testcontainers-go | httptest + 所选 Web 框架测试模式 |
+    | Node/TS | vitest、jest | 内置 mock、msw | testcontainers-node、pg-mem | supertest |
+    | Rust | 内置 + assert | mockall | testcontainers-rs、sqlx test | reqwest + 所选框架（axum/actix）test |
+    | Python | pytest | unittest.mock | testcontainers-python | httpx、fastapi TestClient |
 
-    - 测试文件与源码同目录
-    - 命名：集成 `*_integration_test.go`、E2E `*_e2e_test.go`、单元 `*_test.go`（Go 惯例；其他语言按惯例）
-    - 函数命名：`Test<HandlerFunc>_<UCS编号>_<场景>`
-    - 表驱动 + 子用例组织多场景
+    ## 测试文件与命名规范（按所选语言惯例）
+
+    | 语言 | 文件命名（与源码同目录） | 函数/用例组织 |
+    | Go | 集成 `*_integration_test.go`、E2E `*_e2e_test.go`、单元 `*_test.go` | `Test<HandlerFunc>_<UCS编号>_<场景>`，表驱动 + t.Run |
+    | Node/TS | `*.test.ts`、`*.spec.ts` | `describe`/`it`，`test.each` 参数化 |
+    | Rust | 同文件 `#[cfg(test)] mod tests` 或 `*_test.rs` | `#[test]`/`#[tokio::test]`，参数化用 `#[test_case]` 或循环 |
+    | Python | `test_*.py` | pytest 函数，`@pytest.mark.parametrize` |
 
     ## 覆盖矩阵（从 UCS 提取，尽量覆盖）
 
@@ -56,7 +64,7 @@
 
     ## 依赖管理
 
-    测试所需第三方库按语言测试框架加入依赖清单，版本合理、稳定。
+    测试所需第三方库按所选语言的测试框架加入依赖清单，版本合理、稳定。
 
     ## 验收
 
