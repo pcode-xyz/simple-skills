@@ -1,7 +1,7 @@
 {
   "name": "simple",
-  "version": "0.1.51",
-  "description": "simple 的个人效率自动化技能集：文档结构初始化、产品 demo、业务流程建模、统一语言词汇表、数据库设计、接口定义、技术选型、目录结构设计、HTTP handler 说明、工具层设计、目录脚手架搭建、DB 初始化、接口用例规约、页面用例规约、异步任务选型、接口编码实现、测试代码编写等。",
+  "version": "0.1.52",
+  "description": "simple 的个人效率自动化技能集：文档结构初始化、产品 demo、业务流程建模、统一语言词汇表、数据库设计、接口定义、技术选型、目录结构设计、HTTP handler 说明、工具层设计、目录脚手架搭建、DB 初始化、接口用例规约、页面用例规约、异步任务选型、接口编码与测试实现等。",
   "author": {
     "name": "simple"
   },
@@ -23,7 +23,6 @@
     "./skills/ucs-api",
     "./skills/ucs-page",
     "./skills/standards-task",
-    "./skills/do-api",
-    "./skills/do-test"
+    "./skills/do-api"
   ]
 }

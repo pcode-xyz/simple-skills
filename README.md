@@ -39,8 +39,7 @@ claude plugin install simple@simple
 | `/simple:ucs-api` | 接口用例规约 UCS（仅后端）：顺序 subagent 生成 UCS → API-UCS，再安全审查（6 维度）→ API-UCS-review |
 | `/simple:ucs-page` | 页面用例规约 Page UCS（仅写页面端）：盘点 demo 页面→逐任务 subagent 生成 → page-UCS |
 | `/simple:standards-task` | 异步任务层选型（仅后端）：候选对比+架构决策 → task-layer-rule/draft |
-| `/simple:do-api` | 接口编码实现（仅后端，执行型）：盘点 UCS→待办→顺序 subagent 写码→编译通过验收 |
-| `/simple:do-test` | 测试代码编写（仅后端，执行型）：盘点 UCS→顺序 subagent 写测试→更新测试脚本 |
+| `/simple:do-api` | 接口编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 UCS→编译通过，再顺序 subagent 写测试→更新测试脚本 |
 
 ## 开发
 
