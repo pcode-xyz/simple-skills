@@ -9,6 +9,12 @@ description: 按 task-UCS 实现异步任务代码并编写测试（执行型，
 
 > **主流程只做编排，不读业务 spec**（避免上下文超限）；spec 读取由各 subagent 自行完成。
 
+## 模板文件（本 skill 自带）
+
+- `templates/task-impl-prompt.md` → 任务实现 prompt（Glob 定位，不硬编码缓存路径）
+- `templates/task-test-prompt.md` → 任务测试 prompt
+- `templates/task-ucs-to-testing-rule.md` → **task-UCS 转测试提取规范**（核心规范，测试 subagent 必须通读；源自 self-driving-services 项目，已随插件打包）
+
 ## 前置依赖（先检查，缺失就停）
 
 - **仅后端**：读 `docs/standards/tech-stack-rule.md` 的"选型上下文"，若**端 ≠ 后端**，提示此 skill 只服务后端，结束。

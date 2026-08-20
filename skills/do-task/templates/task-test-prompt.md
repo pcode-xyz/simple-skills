@@ -14,7 +14,7 @@
     - 技术选型：docs/standards/tech-stack-rule.md（语言/测试框架）
     - 目录结构：docs/standards/directory-rule.md
     - 任务层方案：docs/standards/task-layer-rule.md（编码规范）
-    - task-UCS 转测试提取规范：docs/standards/task-ucs-to-testing-rule.md（如存在，务必通读）
+    - task-UCS 转测试提取规范：本 skill 自带模板（Glob 定位 `**/skills/do-task/templates/task-ucs-to-testing-rule.md`，**核心规范，务必通读**）
     - DB 设计：docs/specs/data/（table.sql 或 schema.json）
     - 现有任务源码与测试：按 directory-rule / task-layer-rule 定位的**任务层目录**下对应模块（含已有 setup_test / TestMain / testhelper）
 
