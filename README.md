@@ -28,6 +28,7 @@ claude plugin install simple@simple
 | `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） |
 | `/simple:business-flow` | 基于 sense.md + demo 原型稿，用四色建模法梳理业务流程（business-flow.md） |
 | `/simple:glossary` | 统一语言词汇表：business-flow → glossary.md，subagent 逐页对比 demo，分歧/缺失处理 |
+| `/simple:db` | 数据库设计：选 DB 类型（推荐），MySQL 9 条规范生成 table.sql，其他 DB 适配 |
 
 ## 开发
 
