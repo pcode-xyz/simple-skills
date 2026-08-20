@@ -1,7 +1,7 @@
 {
   "name": "simple",
-  "version": "0.1.4",
-  "description": "simple 的个人效率自动化技能集：文档结构初始化、产品 demo 等。",
+  "version": "0.1.5",
+  "description": "simple 的个人效率自动化技能集：文档结构初始化、产品 demo、业务流程建模等。",
   "author": {
     "name": "simple"
   },
@@ -9,6 +9,7 @@
   "keywords": ["productivity", "docs", "automation"],
   "skills": [
     "./skills/doc-init",
-    "./skills/demo"
+    "./skills/demo",
+    "./skills/business-flow"
   ]
 }

@@ -26,6 +26,7 @@ claude plugin install simple@simple
 | --- | --- |
 | `/simple:doc-init` | 初始化项目文档目录结构（docs/ 完整子目录树） |
 | `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） |
+| `/simple:business-flow` | 基于 sense.md + demo 原型稿，用四色建模法梳理业务流程（business-flow.md） |
 
 ## 开发
 
