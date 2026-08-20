@@ -51,11 +51,16 @@ description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准
 
 **顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只让它处理 `docs/product/demo/` 的**一个页面**；等它返回并合并结果后，再起下一个处理下一页。**不要并行。**
 
-每个 subagent 任务（只读、不写文件）：
-1. 只读指定页面的 HTML；
-2. 结合 business-flow.md 的业务流程，理解该页面需要哪些接口；
-3. 按 Step 3 所选风格的规范，为每个接口输出 OpenAPI 3.0 定义（含请求/响应样例）；
-4. 返回结构化结果：接口清单（`模块/操作`）＋ 每个接口的 OpenAPI 片段。
+**起 subagent 时 prompt 必须自包含**（subagent 是独立上下文，不继承父级规范，不能只写"按上面规则来"）：
+
+每个 subagent 的 prompt 必须包含——
+1. **要读的文件**（逐条列出路径）：
+   - 该页面的 HTML（demo 下**只读这一个页面**，不读其他 demo 页面）；
+   - `docs/product/business-flow.md`（业务流程上下文）；
+   - `docs/specs/data/` 下的 DB 设计文件（MySQL/SQLite/PostgreSQL → `table.sql`，MongoDB → `schema.json`）——**接口字段名/类型以此为准**；
+   - `docs/product/glossary.md`（DB 缺失字段的英文名兜底）。
+2. **输出规则**（逐条内嵌在 prompt 里，不引用外部）：严格 OpenAPI 3.0、使用中文、统一 `{code,data,message}` envelope（code=0 成功）、方法限制（按所选风格：只用 GET/POST 或 RESTful 方法集）、URL 无路径参数（或资源化）、server url（已确认的默认/用户域名，路径不含 /api 前缀）、**每个接口必须带请求与响应样例**、接口名 `模块/操作` 格式。
+3. **行为约束**：只读不写文件，返回结构化结果（接口清单 ＋ 每个接口的 OpenAPI 片段）。
 
 主流程（每页完成后）：
 - 接口名格式：**`模块/操作`**（如 `trip/create`、`trip/like`、`user/favorite`；RESTful 风格下操作名与资源方法对应）。
