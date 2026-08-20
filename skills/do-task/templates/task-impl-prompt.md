@@ -14,7 +14,7 @@
     - 目录结构：docs/standards/directory-rule.md
     - 异步任务技术方案：docs/standards/task-layer-rule.md（任务四要素、依赖方向、进程模型、注册方式）
     - 工具层：docs/standards/tools-rule.md
-    - DB 设计：docs/specs/data/（table.sql 或 schema.json）
+    - DB 设计：docs/specs/data/（table.sql / schema.json；struct.md 数据结构定义，如存在）
     - 接口设计：docs/specs/API（任务关联接口，如需要）
     - 现有源码：按 directory-rule / task-layer-rule 定位的**任务层目录**下对应模块（不预设为 task/）
 
@@ -22,7 +22,7 @@
 
     1. 阅读本 task-UCS，完成该异步任务的**所有用例**（处理函数、参数校验、业务逻辑、状态标记）
     2. 遵守 task-layer-rule.md 的任务定义模式（类型常量 / Payload / NewTask / Handle）与依赖方向（handler 只入队、task 只执行）
-    3. **数据模型与 docs/specs/data/ 的 DB 设计一致**（字段名/类型/非空）
+    3. **数据模型与 docs/specs/data/ 一致**（DB 表结构 + struct.md 显式结构，如存在；字段名/类型/非空）
     4. 业务逻辑需要 tools 工具时，按 tools-rule.md 指引开发对应工具
     5. 遵守 directory-rule.md 的目录结构
     6. **编译通过即可**：在项目根运行该语言的编译命令（Go: `go build ./...`；Node: `npm run build`；Rust: `cargo build`；以 tech-stack-rule 为准）

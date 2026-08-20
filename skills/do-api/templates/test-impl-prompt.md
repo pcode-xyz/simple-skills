@@ -14,7 +14,7 @@
     - 技术选型：docs/standards/tech-stack-rule.md（语言/测试框架）
     - 目录结构：docs/standards/directory-rule.md
     - 工具层：docs/standards/tools-rule.md
-    - DB 设计：docs/specs/data/（table.sql 或 schema.json）
+    - DB 设计：docs/specs/data/（table.sql / schema.json；struct.md 数据结构定义，如存在）
     - 接口设计：docs/specs/API/<同名>.yaml
     - 现有源码：handlers/、tools/ 下对应文件（如需要）
 

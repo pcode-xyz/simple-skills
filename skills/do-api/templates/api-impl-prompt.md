@@ -15,14 +15,14 @@
     - 目录结构：docs/standards/directory-rule.md
     - handler 流转：docs/standards/http-handler-rule.md
     - 工具层：docs/standards/tools-rule.md
-    - DB 设计：docs/specs/data/（table.sql 或 schema.json）
+    - DB 设计：docs/specs/data/（table.sql / schema.json；struct.md 数据结构定义，如存在）
     - 接口设计：docs/specs/API/<同名>.yaml（如需要）
 
     ## 任务要求
 
     1. 阅读自己的 UCS 文件，完成其中**所有接口**的开发（handler、参数校验、业务逻辑、响应封装）
     2. **路由定义与 docs/specs/API 的接口约束一致**（路径 / 方法 / 参数 / code-data-message envelope）
-    3. **模型（models / entity）表结构与 docs/specs/data/ 的 DB 设计一致**（字段名/类型/非空）
+    3. **数据模型与 docs/specs/data/ 一致**（DB 表结构 + struct.md 显式结构，如存在；字段名/类型/非空）
     4. 业务逻辑需要 tools 工具时，按 tools-rule.md 指引开发对应工具
     5. 遵守 directory-rule.md 的目录结构，遵循 http-handler-rule.md 的流转写法
     6. **编译通过即可**：在项目根运行该语言的编译命令（Go: `go build ./...`；Node: `npm run build`；Rust: `cargo build`；以 tech-stack-rule 为准），通过后结束

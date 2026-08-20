@@ -21,7 +21,7 @@
     - 帧契约：docs/specs/ws/<模块>.yaml（AsyncAPI；方向语义 subscribe=客户端→服务端、publish=服务端→客户端）
     - 技术选型：docs/standards/tech-stack-rule.md（语言/测试框架/WS 中间件）
     - 目录结构：docs/standards/directory-rule.md
-    - DB 设计：docs/specs/data/（table.sql 或 schema.json）
+    - DB 设计：docs/specs/data/（table.sql / schema.json；struct.md 数据结构定义，如存在）
     - HTTP 历史契约：docs/specs/API/<模块>.yaml（**仅断线重连测试需要 HTTP 历史接口契约时**；HTTP 用例规约 API-UCS 不需要）
     - 现有网关源码与测试：按 directory-rule 定位的 WS 网关目录（含 setup_test / TestMain / 测试辅助）
 

@@ -15,6 +15,7 @@
     - 目录结构：docs/standards/directory-rule.md
     - 工具层：docs/standards/tools-rule.md（请求工具等）
     - 接口定义：docs/specs/API（与页面数据相关的）
+    - 数据结构定义：docs/specs/data/struct.md（如存在；页面数据渲染对齐的共享结构）
     - 已实现页面：目标项目中已完成的页面源码（参考其 dark/light 与 mock 模式约定）
 
     ## 任务要求

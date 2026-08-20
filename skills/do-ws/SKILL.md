@@ -36,7 +36,7 @@ description: 按 UCS-ws 实现 WS 网关代码并编写测试（执行型，仅�
 按任务清单**顺序**逐一执行：每起一个 subagent 实现一个 UCS-ws；该任务完成（subagent 报告编译通过）后再处理下一个。**不要并行、不要跳跃**——路由/注册、依赖清单等**共享文件**（具体文件名以所选技术栈 / 目录结构为准）靠顺序执行避免冲突。
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/ws-impl-prompt.md`，Glob 定位）：
-- **由 subagent 自己读**：本 UCS-ws + specs/ws（帧契约）+ tech-stack-rule（WS 中间件/编译命令）+ directory-rule + tools-rule + docs/specs/data + 现有网关源码。
+- **由 subagent 自己读**：本 UCS-ws + specs/ws（帧契约）+ tech-stack-rule（WS 中间件/编译命令）+ directory-rule + tools-rule + docs/specs/data（含 struct.md 数据结构定义，如存在）+ 现有网关源码。
 - 实现握手认证、帧处理/落库/广播、房间管理、跨进程转发；帧契约与方向语义以 specs/ws 为准；**单任务编译通过**。
 
 主流程在每个 subagent 返回后只做**轻量校验**：确认该任务已实现、subagent 报告编译通过。失败则让该 subagent 修复。
@@ -48,7 +48,7 @@ description: 按 UCS-ws 实现 WS 网关代码并编写测试（执行型，仅�
 按任务清单**顺序**逐一执行：每起一个 subagent 为一个 UCS-ws 编写测试；该任务完成（subagent 报告测试编译通过）后再处理下一个。**不要并行、不要跳跃**（测试辅助等共享文件靠顺序执行避免冲突）。
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/ws-test-prompt.md`，Glob 定位）：
-- **由 subagent 自己读**：本 UCS-ws + specs/ws（方向语义）+ tech-stack-rule（测试框架/WS 中间件）+ directory-rule + docs/specs/data + 现有网关源码与测试；HTTP 历史契约（docs/specs/API/<模块>.yaml）**仅断线重连测试需要**。
+- **由 subagent 自己读**：本 UCS-ws + specs/ws（方向语义）+ tech-stack-rule（测试框架/WS 中间件）+ directory-rule + docs/specs/data（含 struct.md，如存在）+ 现有网关源码与测试；HTTP 历史契约（docs/specs/API/<模块>.yaml）**仅断线重连测试需要**。
 - 按 `ws-ucs-to-testing-rule.md` 提取场景与覆盖矩阵；方向语义、握手拒绝、进程内 vs 跨进程广播、断线重连、心跳等关键约定；**测试编译通过**。
 
 主流程在每个 subagent 返回后只做**轻量校验**：确认该任务已实现、subagent 报告测试编译通过。失败则让该 subagent 修复。

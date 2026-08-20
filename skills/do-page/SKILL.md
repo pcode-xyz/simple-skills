@@ -29,7 +29,7 @@ description: 页面开发（执行型，仅写页面的端，subagent 会写真�
 按任务清单**顺序**逐一执行：每起一个 subagent 实现一个页面；该任务完成（subagent 报告编译通过）后再处理下一个。**不要并行、不要跳跃**——共享文件（路由、样式主题等，具体文件名以所选技术栈为准）靠顺序执行避免冲突。
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/page-impl-prompt.md`，Glob 定位）：
-- **由 subagent 自己读**：本页面公约 + demo HTML + tech-stack-rule（组件库/构建命令）+ directory-rule + tools-rule + 相关 API + 已实现页面（dark/light、mock 惯例）。
+- **由 subagent 自己读**：本页面公约 + demo HTML + tech-stack-rule（组件库/构建命令）+ directory-rule + tools-rule + 相关 API + docs/specs/data/struct.md（如存在）+ 已实现页面（dark/light、mock 惯例）。
 - 按公约实现（URL / 数据源 / 组件树 / 组件调整 / 交互流）；组件库从 tech-stack-rule；dark/light 与 mock 与已实现一致；先 mock 数据；**单任务编译通过**。
 
 主流程在每个 subagent 返回后只做**轻量校验**：确认该任务已实现、subagent 报告编译通过。失败则让该 subagent 修复。

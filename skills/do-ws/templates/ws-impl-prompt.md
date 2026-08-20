@@ -14,7 +14,7 @@
     - 技术选型：docs/standards/tech-stack-rule.md（WS 中间件/编译命令）
     - 目录结构：docs/standards/directory-rule.md（WS 网关目录，不预设为 cmd/ws）
     - 工具层：docs/standards/tools-rule.md
-    - DB 设计：docs/specs/data/（table.sql 或 schema.json）
+    - DB 设计：docs/specs/data/（table.sql / schema.json；struct.md 数据结构定义，如存在）
     - 现有源码：WS 网关目录下对应模块
 
     ## 任务要求
@@ -23,7 +23,7 @@
     2. **帧契约以 specs/ws 为准**：方向语义「subscribe = 客户端→服务端（网关接收）」「publish = 服务端→客户端（网关发送）」
     3. 遵守 channel 生命周期（连接 / 收发 / 断线重连）与投递语义（durable/transient、可重放、幂等）
     4. 遵守协议约定：心跳 Ping/Pong、前向兼容（只增字段）、未知 type 忽略、限流
-    5. **数据模型与 docs/specs/data/ 一致**；入队任务按本 UCS-ws 的「数据要求-涉及的任务」表（如涉及）
+    5. **数据模型与 docs/specs/data/ 一致**（DB 表结构 + struct.md 显式结构，如存在）；入队任务按本 UCS-ws 的「数据要求-涉及的任务」表（如涉及）
     6. 遵守 directory-rule.md 的目录结构
     7. **编译通过即可**：在项目根运行该语言的编译命令（以 tech-stack-rule 为准）
 

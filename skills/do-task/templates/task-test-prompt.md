@@ -21,7 +21,7 @@
     - 技术选型：docs/standards/tech-stack-rule.md（语言/测试框架）
     - 目录结构：docs/standards/directory-rule.md
     - 任务层方案：docs/standards/task-layer-rule.md（编码规范）
-    - DB 设计：docs/specs/data/（table.sql 或 schema.json）
+    - DB 设计：docs/specs/data/（table.sql / schema.json；struct.md 数据结构定义，如存在）
     - 现有任务源码与测试：按 directory-rule / task-layer-rule 定位的任务层目录下对应模块（含已有 setup_test / TestMain / testhelper）
 
     ## 行为约束

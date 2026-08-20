@@ -29,7 +29,7 @@ description: 按 API-UCS 实现后端接口代码并编写测试（执行型，�
 按任务清单**顺序**逐一执行：每起一个 subagent 实现一个 UCS；该任务完成（subagent 报告编译通过）后再处理下一个。**不要并行、不要跳跃**——路由注册、依赖清单、数据模型等**共享文件**（具体文件名以所选技术栈 / 目录结构为准，不预设为某语言）靠顺序执行避免冲突。
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/api-impl-prompt.md`，Glob 定位）：
-- **由 subagent 自己读**：本 UCS + tech-stack-rule（语言/编译命令）+ directory-rule + http-handler-rule + tools-rule + docs/specs/data + 同名 API。
+- **由 subagent 自己读**：本 UCS + tech-stack-rule（语言/编译命令）+ directory-rule + http-handler-rule + tools-rule + docs/specs/data（含 struct.md 数据结构定义，如存在）+ 同名 API。
 - 实现该 UCS 所有接口；路由对齐 API；数据模型对齐 DB；按需开发 tools；**单任务编译通过**。
 
 主流程在每个 subagent 返回后只做**轻量校验**：确认该任务已实现、subagent 报告编译通过。失败则让该 subagent 修复。
@@ -41,7 +41,7 @@ description: 按 API-UCS 实现后端接口代码并编写测试（执行型，�
 按任务清单**顺序**逐一执行：每起一个 subagent 为一个 UCS 编写测试；该任务完成（subagent 报告测试编译通过）后再处理下一个。**不要并行、不要跳跃**（测试辅助等共享文件靠顺序执行避免冲突）。
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/test-impl-prompt.md`，Glob 定位）：
-- **由 subagent 自己读**：本 UCS + tech-stack-rule（语言/测试框架）+ directory-rule + tools-rule + docs/specs/data + 同名 API + 现有源码（handlers/、tools/）。
+- **由 subagent 自己读**：本 UCS + tech-stack-rule（语言/测试框架）+ directory-rule + tools-rule + docs/specs/data（含 struct.md，如存在）+ 同名 API + 现有源码（按 directory-rule 定位）。
 - 从 UCS 提取场景（Happy / Branch / Negative / Rule / Concurrency）→ 按业务特征选测试类型（单元 / 集成 / E2E）→ 按命名规范写测试文件 → 覆盖矩阵尽量覆盖 → 测试辅助复用或创建 → **测试编译通过**。
 
 主流程在每个 subagent 返回后只做**轻量校验**：确认该任务已实现、subagent 报告测试编译通过。失败则让该 subagent 修复。
