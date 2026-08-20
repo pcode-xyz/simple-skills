@@ -54,10 +54,11 @@ description: 技术选型。先选端（前端/后端/App/桌面端/小程序）
 
 AskUserQuestion：
 - **薄层级垂直切片架构（推荐）**：中间件与工具层做抽象，业务编排保持平铺
-- **标准 DDD 架构**：按本 skill 目录下 `templates/ddd-architecture.md` 的规格（四层整洁架构 api/application/domain/infra、限界上下文、仓储模式、贫血领域模型+领域服务、Contract/Impl 分离、严格 TDD）
+- **扁平业务切片**：业务代码零抽象、基础设施平铺，每个接口一个文件自包含
+- **标准 DDD 架构**：四层整洁架构（api/application/domain/infra）+ 限界上下文
 - 其他（自定义）
 
-记录结果，注入 Step 4 的 prompt。选 DDD 时，用 Glob 定位并读取 `templates/ddd-architecture.md`（不要硬编码缓存路径），将其**架构原则**注入选型 prompt；其"输出要求"（目录树/代码骨架/DI/请求流转）属于后续架构设计阶段，技术选型阶段不执行。
+记录结果，仅作为选型约束的一句话说明注入 Step 4 的 prompt；**详细的目录结构设计由 `/simple:standards-directory` 完成**。
 
 ## Step 4 — 构造选型 prompt 并执行（subagent）
 
@@ -86,9 +87,10 @@ AskUserQuestion：
     - 其他中间件根据项目需要选型（JWT、WebSocket、HTTP 客户端等），每个选型需给出理由和替代方案对比
     - 需要选当前最流行的，与本地环境匹配的中间件
 
-架构约束行按 Step 3 的选择注入：
+架构约束行按 Step 3 的选择注入（一句话约束，选型阶段用；**详细目录设计由 standards-directory 完成**）：
 - 垂直切片 → "中间件与工具层需要做抽象，而业务编排需要保持平铺（薄层级的垂直切片架构）"
-- DDD → 读取 `templates/ddd-architecture.md`，把其**架构原则**整块注入（四层整洁架构、依赖方向、限界上下文、仓储模式、贫血领域模型+领域服务、Contract/Impl 分离、严格 TDD），并按所选后端语言映射技术（如 Go → GORM/ent + wire/fx；NestJS → TypeORM/Prisma 内置 DI）
+- 扁平业务切片 → "业务代码零抽象、基础设施平铺，每个接口一个文件自包含；工具库按需直调，不包装成 Service"
+- DDD → "工程结构按 DDD 分层（api/application/domain/infra），选型需支持 DI 与仓储模式解耦"
 - 其他 → 按用户描述写
 
 ### 4.2 执行（subagent）
