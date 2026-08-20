@@ -68,12 +68,33 @@ description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准
 - **增量合并，不覆盖**：同一模块文件被多页写入时，向 `paths` 补新路径；若某接口已存在（别的页面也需要），复用并核对一致性，不重复定义。
 - `mkdir -p docs/specs/API`；文件已存在先读再合并。
 
-## Step 5 — gRPC 适配（基于上面"看着改"）
+## Step 5 — gRPC 生成接口（subagent，逐页）
 
-- `mkdir -p docs/specs/grpc`，输出 proto3 到 `docs/specs/grpc/模块.proto`（如 `trip.proto`、`user.proto`）。
-- service 方法按 `模块/操作` 语义命名（如 `rpc TripCreate`），message 字段用 glossary/DB 英文。
-- 统一返回：定义公共 `ApiResponse`（`int32 code; string message;` + data），按模块复用。
-- 同样遵守：中文注释、非 0 code 表示失败、样例注释给出请求/响应示例、按模块分文件增量合并。
+gRPC 与 HTTP 共享前置依赖、Step 4 的顺序 subagent 生成方式与增量合并逻辑，仅输出格式与规范不同。
+
+### 5.1 gRPC 规范（proto3）
+
+- **使用中文**：注释、描述用中文。
+- 先读 `docs/product/business-flow.md` 理解业务流程，再去理解要处理的页面。
+- **每个模块一个 `.proto` 文件**，proto3 语法：`syntax = "proto3";`、`package <模块>;`（如 `package trip;`）。
+- **service / RPC 命名**：按 `模块/操作` 语义——模块作 service（如 `service TripService`），操作作 RPC 方法（如 `rpc Create`、`rpc Like`）；请求/响应 message 命名 `XxxRequest` / `XxxResponse`。
+- **字段名/类型优先遵守 DB 文件**：以 `docs/specs/data/` 下的 DB 设计文件为准（MySQL/SQLite/PG → `table.sql`，MongoDB → `schema.json`），缺失用 glossary 英文名。proto 字段用 snake_case；类型按 DB 映射（varchar→`string`、int→`int32`/`int64`、timestamp→`google.protobuf.Timestamp`、非负数→`uint32`/`uint64` 等）。
+- **统一返回结构** `{code, data, message}`：每个 RPC 的响应 message 包含 `int32 code`（0 成功，非 0 失败）、`string message`（错误原因），以及**具体化的 data 字段**——proto 无泛型，不用 `google.protobuf.Any`，data 用具体字段。
+- **样例**：每个 RPC 在注释里给出请求/响应示例（`// 请求：...` `// 响应：...`）。
+- 公共类型（时间戳、分页等）在文件顶部 `import` 或复用模块内 message。
+
+### 5.2 顺序生成（subagent，逐页）
+
+与 Step 4 完全一致的方式：**顺序性子任务，每次只做一个**，用 Agent 工具起 subagent，只让它处理 `docs/product/demo/` 的**一个页面**，等返回合并后再处理下一页，**不要并行**。
+
+起 subagent 时 prompt 必须**自包含**（subagent 不继承父级规范）：
+1. **要读的文件**（逐条列出）：该页面 HTML（demo 下只读这一页）＋ `docs/product/business-flow.md` ＋ `docs/specs/data/` 下的 DB 设计文件（字段名/类型以此为准）＋ `docs/product/glossary.md`（兜底）。
+2. **输出规则**（逐条内嵌）：上面的 5.1 gRPC 规范——proto3 语法、中文注释、service/RPC 按 `模块/操作`、字段名/类型遵守 DB、统一 `code/data/message` 响应、每个 RPC 带请求/响应样例注释。
+3. **行为约束**：只读不写文件，返回结构化结果（接口清单 ＋ 每个接口的 proto 片段）。
+
+主流程（每页完成后）：
+- **按模块落盘**：`mkdir -p docs/specs/grpc`；`trip/*` → `docs/specs/grpc/trip.proto`，`user/*` → `docs/specs/grpc/user.proto`。
+- **增量合并，不覆盖**：同一 proto 被多页写入时，向 service 补 RPC、向文件补 message；已存在的 RPC/message 复用并核对一致性，不重复定义。
 
 ## 完成后
 
