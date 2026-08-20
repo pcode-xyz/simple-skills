@@ -26,9 +26,12 @@ description: 接口用例规约（Use Case Specification，仅后端）。两阶
 - 列出 `docs/specs/API/` 下所有接口 yaml，报告总数。
 - 用 AskUserQuestion 请用户**排除与业务用例无关的文档**，得到待生成清单。
 
-### 1.2 顺序生成（每个接口一个 subagent）
+### 1.2 顺序生成（每个接口一个 subagent，直接落盘）
 
-**顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理一个接口文档；等返回并落盘后，再处理下一个。**不要并行。**
+**顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理一个接口文档；等它完成后再处理下一个。**不要并行。** 每个 subagent 产出独立文件，无共享冲突，故**由 subagent 直接写入**。
+
+主流程在起 subagent **前**先检查目标文件是否已存在：
+- 已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
 
 每个 subagent 的 prompt 必须**自包含**：
 1. **要读的文件**：该接口的 yaml（`docs/specs/API/<模块>.yaml`）、UCS 模板（Glob 定位 `templates/ucs-template.md`）、`docs/specs/data/` 下 DB 文件、`docs/standards/tech-stack-rule.md`、`docs/standards/directory-rule.md`、`docs/standards/http-handler-rule.md`。
@@ -41,16 +44,19 @@ description: 接口用例规约（Use Case Specification，仅后端）。两阶
      - **安全视角**：越权、注入、敏感信息等风险及对策；
      - **网络异常**：超时、重试、幂等、部分失败的处理；
    - 字段名/类型对齐 DB 文件（`docs/specs/data/`），流程对齐 http-handler-rule。
-3. **行为约束**：只读不写文件，返回完整的 UCS 文档内容（markdown）。
+3. **直接写入**：把生成的 UCS 写入确切路径 `docs/specs/API-UCS/<模块>.md`（先 `mkdir -p docs/specs/API-UCS`）；写完后报告写入路径与文件大小。
 
-主流程（每接口完成后）：
-- `mkdir -p docs/specs/API-UCS`；写 `docs/specs/API-UCS/<模块>.md`（文件名与接口文档对应）。已存在则先读再问：覆盖 / 备份后替换 / 跳过。
+主流程（subagent 返回后）：
+- **校验**写入的文件：存在、结构符合模板（用例清单 + 各用例 10 小节 + 模块级汇总）。异常则让该 subagent 重写或主流程修正。
 
 ## Phase 2 — 审查 UCS（顺序 subagent，逐文档）
 
-### 2.1 顺序审查（每个 UCS 文档一个 subagent）
+### 2.1 顺序审查（每个 UCS 文档一个 subagent，直接落盘）
 
-**顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理 `docs/specs/API-UCS/` 的一个文档；等返回并落盘后，再处理下一个。**不要并行。**
+**顺序性子任务，每次只做一个**：用 Agent 工具起一个 subagent，只处理 `docs/specs/API-UCS/` 的一个文档；等它完成后再处理下一个。**不要并行。** 每个 subagent 产出独立文件，由 **subagent 直接写入**。
+
+主流程在起 subagent **前**先检查目标文件是否已存在：
+- 已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
 
 每个 subagent 的 prompt 必须**自包含**：
 1. **要读的文件**：该 UCS 文档（`docs/specs/API-UCS/<模块>.md`）、对应的 API 文档（`docs/specs/API/<同名>.yaml`）、审查模板（Glob 定位 `templates/ucs-review-template.md`）、`docs/specs/data/` 下 DB 文件、`docs/standards/tech-stack-rule.md`、`docs/standards/directory-rule.md`。
@@ -58,10 +64,10 @@ description: 接口用例规约（Use Case Specification，仅后端）。两阶
    - **使用中文**；按 `templates/ucs-review-template.md` 结构输出；
    - 按 6 个安全维度逐项检查：**水平越权**（写操作是否校验资源归属）、**输入校验**（长度/类型/范围/结构/SQL注入/XSS）、**竞态条件**（并发同资源防护）、**数据泄露**（返回敏感字段）、**幂等性**（重复调用安全）、**状态机**（流转是否严格）；
    - 问题按严重程度 S/M/L 编号，每个严重问题对应到具体用例步骤与触发路径。
-3. **行为约束**：只读不写文件，返回完整审查报告（markdown）。
+3. **直接写入**：把审查报告写入确切路径 `docs/specs/API-UCS-review/<同名>.md`（先 `mkdir -p docs/specs/API-UCS-review`）；写完后报告写入路径与文件大小。
 
-主流程（每文档完成后）：
-- `mkdir -p docs/specs/API-UCS-review`；写 `docs/specs/API-UCS-review/<同名>.md`。已存在则先读再问：覆盖 / 备份后替换 / 跳过。
+主流程（subagent 返回后）：
+- **校验**写入的文件：存在、结构符合审查模板（S/M/L 问题清单 + 6 维度分析）。异常则让该 subagent 重写或主流程修正。
 
 ## 完成后
 
