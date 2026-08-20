@@ -27,7 +27,10 @@ description: 目录结构设计。读 architecture 写入 tech-stack-rule.md 的
 ### 2.1 端 → 模板映射
 
 - 前端 → `templates/frontend-directory.md`
-- 后端 → 按架构风格：扁平业务切片 / 薄层垂直切片 → `templates/flat-slice-architecture.md`；标准 DDD → `templates/ddd-architecture.md`；其他 → 默认 flat-slice
+- 后端 → 按架构风格：
+  - 扁平业务切片 / 薄层垂直切片 → `templates/flat-slice-architecture.md`
+  - 标准 DDD → `templates/ddd-architecture.md`
+  - **其他** → AskUserQuestion 细分：标准 MVC（→ `templates/mvc-architecture.md`）/ 面向对象三层架构（→ `templates/oop-architecture.md`）/ 自定义（按用户描述；无描述时默认 flat-slice）
 - App → `templates/app-directory.md`
 - 桌面端 → `templates/desktop-directory.md`
 - 小程序 → `templates/miniprogram-directory.md`
