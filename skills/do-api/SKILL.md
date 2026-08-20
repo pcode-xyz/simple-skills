@@ -30,7 +30,7 @@ description: 按 API-UCS 实现后端接口代码（执行型，仅后端，suba
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/api-impl-prompt.md` 模板，Glob 定位）：
 - **由 subagent 自己读**：本 UCS + tech-stack-rule（语言/编译命令）+ directory-rule + http-handler-rule + tools-rule + docs/specs/data + 同名 API。
-- 实现该 UCS 所有接口；路由对齐 API；models 对齐 DB；按需开发 tools；**单任务编译通过**。
+- 实现该 UCS 所有接口；路由对齐 API；数据模型对齐 DB；按需开发 tools；**单任务编译通过**。
 
 主流程在每个 subagent 返回后只做**轻量校验**：确认该任务已实现、subagent 报告编译通过。失败则让该 subagent 修复。
 
