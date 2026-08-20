@@ -10,7 +10,7 @@ description: 构建统一语言词汇表。基于 docs/product/business-flow.md 
 ## 前置依赖（先检查，缺失就停）
 
 - 必须存在：`docs/product/business-flow.md`、`docs/product/demo/`（≥1 个 HTML 页面）。
-- 若缺失，提示用户先运行 `/simple:business-flow`，然后结束，不空跑。
+- 若缺失，提示用户先运行 `/simple:product-business`，然后结束，不空跑。
 
 ## 阶段 1 — 从 business-flow.md 生成基础词汇表
 

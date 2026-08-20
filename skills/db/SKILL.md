@@ -11,7 +11,7 @@ description: 数据库设计。基于 docs/product/business-flow.md 业务描述
 
 - 必须存在：`docs/product/business-flow.md`、`docs/product/demo/`（≥1 个 HTML 页面）。
 - 建议存在：`docs/product/glossary.md`（字段名优先用其中的英文；缺失则用合理英文名并提醒用户）。
-- 缺失必选项时，提示先运行对应 skill（business-flow / demo / product-glossary），然后结束，不空跑。
+- 缺失必选项时，提示先运行对应 skill（product-business / demo / product-glossary），然后结束，不空跑。
 
 ## Step 1 — 选 DB 类型（你来推荐）
 
