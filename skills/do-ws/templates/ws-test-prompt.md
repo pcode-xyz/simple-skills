@@ -23,7 +23,6 @@
     - 目录结构：docs/standards/directory-rule.md
     - DB 设计：docs/specs/data/（table.sql 或 schema.json）
     - HTTP 配套：docs/specs/UCS/ 与 docs/specs/API/（命令/查询；断线补齐依赖）
-    - 异步配套：docs/specs/task-UCS/<模块>.md（**仅当涉及异步帧**，如 ai_stage/ai message 生产方）
     - 现有网关源码与测试：按 directory-rule 定位的 WS 网关目录（含 setup_test / TestMain / 测试辅助）
 
     ## 行为约束
