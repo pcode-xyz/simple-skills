@@ -10,7 +10,7 @@ description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准
 ## 前置依赖（先检查，缺失就停）
 
 - 必须存在：`docs/product/business-flow.md`、`docs/product/demo/`（≥1 个 HTML 页面）。
-- 建议存在：`docs/specs/data/table.sql`（接口字段对齐它；缺失则退化为用 glossary 英文名）、`docs/product/glossary.md`。
+- 建议存在：`docs/specs/data/` 下的 DB 设计文件（MySQL/SQLite/PostgreSQL 为 `table.sql`，MongoDB 为 `schema.json`；接口字段名/类型优先对齐它，缺失则退化为用 glossary 英文名）、`docs/product/glossary.md`。
 - 缺失必选项时，提示先运行对应 skill，结束。
 
 ## Step 1 — 选协议（AskUserQuestion）
@@ -32,7 +32,7 @@ description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准
 - 先读 `docs/product/business-flow.md` 理解业务流程，再去理解要处理的页面。
 - 每个接口**严格 OpenAPI 3.0** 格式。
 - **统一返回结构**：`{ code, data, message }`——`code=0` 成功、`data` 为具体返回值；`code≠0` 失败、`message` 为错误原因。在 `components/schemas` 定义共享 envelope，每个接口响应用它组合出具体 `data` 结构（可用 `allOf`）。
-- **字段对齐 DB**：接口字段名/类型参考 `docs/specs/data/table.sql` 的字段（以 glossary 英文为基准）。
+- **字段名/类型优先遵守 DB 文件**：接口字段名和类型优先按 `docs/specs/data/` 下的 DB 设计文件描述（MySQL/SQLite/PostgreSQL → `table.sql`，MongoDB → `schema.json`）；缺失时用 glossary 英文名。
 - **server**：`servers` 的 url 由用户设置，默认 `http://127.0.0.1`（若用户给了域名则用用户的）；开始生成前与用户确认一次。路径不含 `/api` 前缀。
 - **每个接口必须给出请求与输出样例**：requestBody 带 `examples`，response 带 `examples`。
 
