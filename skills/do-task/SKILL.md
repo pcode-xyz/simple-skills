@@ -47,7 +47,7 @@ description: 按 task-UCS 实现异步任务代码并编写测试（执行型，
 按任务清单**顺序**逐一执行：每起一个 subagent 为一个 task-UCS 编写测试；该任务完成（subagent 报告测试编译通过）后再处理下一个。**不要并行、不要跳跃**（测试辅助等共享文件靠顺序执行避免冲突）。
 
 每个 subagent 的 prompt 必须**自包含**（用 `templates/task-test-prompt.md`，Glob 定位）：
-- **由 subagent 自己读**：本 task-UCS + tech-stack-rule（语言/测试框架）+ directory-rule + task-layer-rule + task-ucs-to-testing-rule（如存在）+ docs/specs/data + 现有任务层源码与测试（位置按 directory-rule / task-layer-rule）。
+- **由 subagent 自己读**：本 task-UCS + tech-stack-rule（语言/测试框架）+ directory-rule + task-layer-rule + task-UCS 转测试提取规范（自带模板 `templates/task-ucs-to-testing-rule.md`，必须通读）+ docs/specs/data + 现有任务层源码与测试（位置按 directory-rule / task-layer-rule）。
 - 从 task-UCS 提取场景（Happy / Branch / Negative / Rule / Concurrency / 纯函数 / 广播）→ 选测试类型（单元 / 集成）→ 命名规范 + 覆盖矩阵 → 复用测试基建（TestMain / testhelper / Mock 策略）→ **测试编译通过**。
 
 主流程在每个 subagent 返回后只做**轻量校验**：确认该任务已实现、subagent 报告测试编译通过。失败则让该 subagent 修复。
