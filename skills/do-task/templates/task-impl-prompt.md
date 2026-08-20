@@ -16,7 +16,7 @@
     - 工具层：docs/standards/tools-rule.md
     - DB 设计：docs/specs/data/（table.sql 或 schema.json）
     - 接口设计：docs/specs/API（任务关联接口，如需要）
-    - 现有源码：task/ 目录下对应模块
+    - 现有源码：按 directory-rule / task-layer-rule 定位的**任务层目录**下对应模块（不预设为 task/）
 
     ## 任务要求
 

@@ -16,7 +16,7 @@
     - 任务层方案：docs/standards/task-layer-rule.md（编码规范）
     - task-UCS 转测试提取规范：docs/standards/task-ucs-to-testing-rule.md（如存在，务必通读）
     - DB 设计：docs/specs/data/（table.sql 或 schema.json）
-    - 现有 task 源码与测试：task/ 下对应模块（含已有 setup_test / TestMain / testhelper）
+    - 现有任务源码与测试：按 directory-rule / task-layer-rule 定位的**任务层目录**下对应模块（含已有 setup_test / TestMain / testhelper）
 
     ## 测试场景提取（从 task-UCS）
 
