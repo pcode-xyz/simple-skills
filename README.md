@@ -81,6 +81,34 @@ claude plugin install simple@simple
 | `/simple:tdd` | 测试全绿修复：跑全量测试→逐失败修复（修代码不修测试）→重跑→直到全部通过 |
 | `/simple:docker` | Docker 容器化部署：生成 Dockerfile/compose/readme-docker.md，覆盖日志/资源/卷/环境/DB 初始化 |
 
+## 最佳实践顺序（按视角）
+
+> 完整流水线见上方技能列表；按视角选择执行路径。命令前缀 `simple`。
+
+### 0. 初始化（所有场景前置）
+
+`init-docs` — 初始化项目文档目录结构（docs/ 完整子目录树）。
+
+### 1. 单纯产品视角
+
+只需 `demo` — 产品思考梳理 + 风格化页面 demo，产出 sense.md + HTML demo 即可。
+
+### 2. 后端开发视角（完成 demo 后）
+
+product-business → product-glossary → specs-api → specs-db → specs-data → architecture → standards-directory → standards-http → standards-tools →（如需）standards-task → do-directory → do-db → ucs-api →（如需）ucs-task → do-api →（如需）do-task → tdd → docker
+
+### 3. 前端开发视角（完成 demo 后）
+
+product-business → do-directory →（将后端 api 文档放入前端目录）→ ucs-page → do-page → 调通后让 AI 把 mock 切换为正式接口
+
+### 4. 小程序
+
+类似前端（复用前端开发视角的执行路径）。
+
+### 5. 客户端
+
+待实践。
+
 ## 开发
 
 - 新增 skill：在 `skills/<skill-name>/SKILL.md` 写 frontmatter（`name`、`description`）+ 指令正文，并把路径加进 `.claude-plugin/plugin.json` 的 `skills` 数组。
