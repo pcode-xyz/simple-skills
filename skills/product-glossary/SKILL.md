@@ -1,9 +1,9 @@
 ---
-name: glossary
+name: product-glossary
 description: 构建统一语言词汇表。基于 docs/product/business-flow.md 整理核心业务词汇生成 glossary.md，再用 subagent 逐页对比 docs/product/demo/ 的 HTML 原型稿，分歧项输出 glossary-different.md、缺失项补充进 glossary.md。当用户想统一术语、建词汇表、梳理统一语言时使用。
 ---
 
-# glossary
+# product-glossary
 
 构建产品的统一语言（Unified Language）词汇表。
 
