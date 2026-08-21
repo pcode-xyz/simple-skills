@@ -8,15 +8,30 @@ disable-model-invocation: true
 
 技术选型：端 → 技术栈 →（后端额外定架构）→ 选型分析落盘到 `docs/standards/`。
 
-## 前置依赖（先检查，缺失就停）
+## Step 0 — 前置检查（分端差异化，先检查后汇报）
 
-- 必须存在：`docs/product/business-flow.md`。
-- 建议存在：`docs/specs/data/`（DB 设计文件，table.sql 或 schema.json）、`docs/specs/API` 或 `docs/specs/grpc`（已定义接口）、`docs/standards/CLAUDE.md`（约束层约定）。
-- 缺失必选项时，提示先运行对应 skill，结束。
+按端检查输入，**后端要求最全，前端/App/桌面端/小程序可放宽**（客户端选型只依赖接口定义）：
 
-## Step 1 — 选端（AskUserQuestion）
+| 端 | 必需（缺失即 ✗） | 建议（缺失可容忍，不阻断） |
+|---|---|---|
+| 后端 | `docs/product/business-flow.md`、`docs/specs/data/`（table.sql 或 schema.json）、API 定义 | `docs/standards/CLAUDE.md`（约束层约定） |
+| 前端 / App / 桌面端 / 小程序 | API 定义 | `docs/product/business-flow.md`、`docs/standards/CLAUDE.md` |
 
-- 前端 / 后端 / App / 桌面端 / 小程序
+> API 定义 = `docs/specs/API`（OpenAPI）或 `docs/specs/grpc`（proto），取已存在者。
+
+检查后**向用户汇报**：按端列出 ✓ / ✗ 及缺失文件，说明当前检查结果能满足哪些端。示例：
+
+> 后端 ✗（缺 business-flow.md）；前端 ✓；App ✓；桌面端 ✓；小程序 ✓ —— 客户端可直接选型，后端需先补齐。
+
+## Step 1 — 选端（AskUserQuestion，存在缺失时并列处理方式）
+
+- 每个端选项标注 ✓（可直接选）或 ✗（缺什么，仍可选）。
+- **所有端均满足** → 直接列端选择。
+- **存在缺失** → 除各端外，同一处额外给出处理方式（AskUserQuestion 一次放不下时，先选端、再紧跟一题问处理方式）：
+  - **强制执行**：忽略缺失，直接进入该端选型（subagent 跳过缺失文件）。
+  - **停止**：提醒用户缺失输入对应哪个前置 skill 的输出（`business-flow.md` ← `/simple:product-business`；API 定义 ← `/simple:specs-api`；`docs/specs/data/` ← `/simple:specs-db` + `/simple:specs-data`），是否去跑、跑哪个由用户决定，不替他选。
+  - **对话补充**：用户在对话中直接补充缺失信息（如口头描述业务流程），补完继续；补充内容在 Step 4 构造 prompt 时作为对应输入替代缺失文件。
+- **切勿自动跳转去跑前置 skill**——停止 / 强制 / 补充由用户选择。
 
 ## Step 2 — 按端选技术栈（每项一份自包含约束块，先给推荐，等用户确认）
 
@@ -76,10 +91,10 @@ AskUserQuestion：
     各选型的详细理由 + 替代方案对比表（{关键候选，如 Gin/Echo/Fiber、GORM/ent/sqlx、slog/zap/zerolog}），
     输出技术栈总览表（类别 / 选型 / 版本 / 职责）。
 
-    请阅读以下文件：
-    - 业务流程描述：docs/product/business-flow.md
-    - DB 设计文件：docs/specs/data/（table.sql 或 schema.json）
-    - 已定义的 API：docs/specs/API（或 docs/specs/grpc）
+    请阅读以下文件（按实际存在列出，缺失的不引用；强制执行或客户端选型时部分文件可能缺失）：
+    - 业务流程描述：docs/product/business-flow.md（存在才读，缺失跳过）
+    - DB 设计文件：docs/specs/data/（存在才读，仅后端选型需要）
+    - 已定义的 API：docs/specs/API（或 docs/specs/grpc，存在才读，客户端选型必需）
 
     ## 技术选型基本要求
     - {架构约束行，见下}
@@ -97,7 +112,7 @@ AskUserQuestion：
 ### 4.2 执行（subagent）
 
 用 Agent 工具起一个 subagent（prompt 用 4.1 构造好的完整内容）：
-1. **要读的文件**：`docs/product/business-flow.md`、`docs/specs/data/` 下 DB 文件、`docs/specs/API` 或 `docs/specs/grpc` 下接口文件、`docs/standards/CLAUDE.md`（了解约束层命名约定）。
+1. **要读的文件**：按实际存在 + 所选端需要列出——后端读 `docs/product/business-flow.md`、`docs/specs/data/` 下 DB 文件、`docs/specs/API` 或 `docs/specs/grpc` 下接口文件；前端/App/桌面端/小程序读接口文件即可。`docs/standards/CLAUDE.md` 存在则读（了解约束层命名约定）。缺失文件不引用。
 2. **返回**（只读不写文件）：技术栈总览（类别/选型/版本/职责）、每个选型的详细理由 + 替代方案对比表、约束清单行（文件名/覆盖范围）。
 3. **行为约束**：只读不写文件，返回上述结构化内容。
 
