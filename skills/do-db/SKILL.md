@@ -1,6 +1,7 @@
 ---
 name: do-db
 description: 数据库初始化（仅后端，执行型，会真实连接并建库建表）。读 tech-stack-rule.md（DB 类型/ORM）+ docs/specs/data/ 的 DB 设计文件，确认连接参数与安全策略后创建库/表/集合。防偏离：只建 spec 里的表、绝不 DROP/覆盖。当用户要真正创建数据库、跑迁移、初始化表结构时使用。
+disable-model-invocation: true
 ---
 
 # do-db

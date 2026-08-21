@@ -1,6 +1,7 @@
 ---
 name: specs-data
 description: 数据结构定义（仅后端）。基于 API 接口描述 + DB 设计 + 技术选型，从数据可靠性角度识别"必须显式封装"的数据结构（DB JSON 字段、跨接口共享复杂结构、嵌套对象、载荷、外部服务契约、共享值对象），输出结构定义到 docs/specs/data/struct.md。当用户要做数据结构定义、共享类型、防止各端实现漂移时使用。
+disable-model-invocation: true
 ---
 
 # specs-data

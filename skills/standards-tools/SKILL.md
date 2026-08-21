@@ -1,6 +1,7 @@
 ---
 name: standards-tools
 description: 工具层设计（通用，任何端/任何架构方式都有工具层）。读 architecture 选型（tech-stack-rule.md 的选型上下文）+ 目录结构（directory-rule.md），展示确认后按端与架构风格选工具层模板，构造 prompt 用 subagent 执行，输出工具层组织方式到 docs/standards/tools-rule.md + tools-draft.md 并登记 CLAUDE.md 清单。当用户想说明工具层怎么组织、组件库包结构、业务代码如何调用工具时使用。
+disable-model-invocation: true
 ---
 
 # standards-tools

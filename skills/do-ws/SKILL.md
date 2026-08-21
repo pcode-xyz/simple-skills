@@ -1,6 +1,7 @@
 ---
 name: do-ws
 description: 按 UCS-ws 实现 WS 网关代码并编写测试（执行型，仅后端，subagent 会写真实代码）。主流程只做编排：盘点 docs/specs/ws-UCS 数量、控制待办；两阶段——先顺序逐一 subagent 实现所有 UCS-ws（握手认证/帧处理/广播/房间管理/跨进程转发，帧契约以 specs/ws 为准、编译通过），再顺序逐一 subagent 为所有 UCS-ws 写测试（方向语义、覆盖矩阵、关键约定→测试编译通过）；最后整体编译并确保测试脚本。当用户要实现 WS 网关代码或写测试时使用。
+disable-model-invocation: true
 ---
 
 # do-ws

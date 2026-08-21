@@ -1,6 +1,7 @@
 ---
 name: init-docs
 description: 初始化项目文档目录结构（按预定义模板创建 docs/ 下的完整子目录树），并在 docs/standards/ 创建 CLAUDE.md（约束层维护规范）。当项目没有 docs 目录、或用户说"初始化文档/建文档目录/开始记文档"时使用。
+disable-model-invocation: true
 ---
 
 # init-docs

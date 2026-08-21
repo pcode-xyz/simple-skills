@@ -1,6 +1,7 @@
 ---
 name: standards-task
 description: 异步任务层技术选型（仅后端）。读 architecture 选型（tech-stack-rule.md）+ 目录/工具层/handler流转，按模板直接分析并落盘 docs/standards/task-layer-rule.md + task-layer-draft.md，登记 CLAUDE.md 清单。当用户要做异步任务、消息队列、后台任务、定时任务的选型时使用。
+disable-model-invocation: true
 ---
 
 # standards-task

@@ -1,6 +1,7 @@
 ---
 name: product-business
 description: 基于 docs/product/sense.md 与 docs/product/demo/ 原型稿，用四色建模法梳理产品业务流程，输出 docs/product/business-flow.md。当用户想梳理业务流程、做产品层面建模、看清核心主脉络的流程时使用。
+disable-model-invocation: true
 ---
 
 # product-business

@@ -1,6 +1,7 @@
 ---
 name: standards-directory
 description: 目录结构设计。读 architecture 写入 tech-stack-rule.md 的"选型上下文"（端/技术栈/后端架构风格），展示给用户确认后按端与架构风格选目录模板，构造目录设计 prompt 用 subagent 执行，输出目录树到 docs/standards/directory-rule.md + directory-draft.md 并登记 CLAUDE.md 清单。当用户要做目录结构设计、工程骨架、代码组织规划时使用。
+disable-model-invocation: true
 ---
 
 # standards-directory

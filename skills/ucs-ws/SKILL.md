@@ -1,6 +1,7 @@
 ---
 name: ucs-ws
 description: WS 通道用例规约（WS Use Case Specification，仅后端）。从 specs/ws（AsyncAPI 帧契约）+ business-flow/demo 识别实时通道与帧，用 grilling 模式一个通道一个通道探讨清楚（帧功能/收发语义/投递语义/依赖/边界），每通道探讨达成共识后按 ucs-ws-template.md 生成 WS-UCS 直接写入 docs/specs/ws-UCS/<模块>.md。当用户要做 WS 用例规约、WS-UCS 时使用。
+disable-model-invocation: true
 ---
 
 # ucs-ws

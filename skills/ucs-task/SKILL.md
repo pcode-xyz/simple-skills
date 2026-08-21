@@ -1,6 +1,7 @@
 ---
 name: ucs-task
 description: 异步任务用例规约（Task Use Case Specification，仅后端）。先从 business-flow 梳理出需要哪些异步任务，用 grilling 模式一个任务一个任务探讨清楚（功能/触发/主流程/依赖/边界），每任务探讨达成共识后按 ucs-task-template.md 生成 task-UCS 直接写入 docs/specs/task-UCS/<模块>.md。当用户要做异步任务用例规约、task-UCS 时使用。
+disable-model-invocation: true
 ---
 
 # ucs-task

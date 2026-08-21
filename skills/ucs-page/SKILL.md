@@ -1,6 +1,7 @@
 ---
 name: ucs-page
 description: 页面用例规约（Page UCS，仅写页面的端适用）。盘点 docs/product/demo 的页面生成编号任务清单，逐任务顺序 subagent：读该页面 HTML + docs/specs/API 接口 + page-ucs-template.md（组件库从 tech-stack-rule 取值），生成页面公约直接写入 docs/specs/page-UCS/<页面>.md。当用户要做页面公约、页面用例规约、页面组件与交互设计时使用。
+disable-model-invocation: true
 ---
 
 # ucs-page

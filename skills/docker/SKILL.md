@@ -1,6 +1,7 @@
 ---
 name: docker
 description: 基于技术架构用 Docker 承载开发/正式环境（执行型，会写配置文件）。读 tech-stack-rule（语言/框架/DB/Redis/队列）确认技术栈，询问是否含数据库/依赖容器，生成 Dockerfile（多阶段构建）、docker-compose.yml（+ dev/prod override）、.dockerignore、readme-docker.md（项目根）。覆盖日志轮转、CPU/内存限制、数据卷挂载、dev/prod 配置载入、外部命令调用、健康检查、重启策略、DB 初始化。当用户要做容器化部署、Dockerfile、docker-compose、Docker 环境时使用。
+disable-model-invocation: true
 ---
 
 # docker

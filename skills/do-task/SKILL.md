@@ -1,6 +1,7 @@
 ---
 name: do-task
 description: 按 task-UCS 实现异步任务代码并编写测试（执行型，仅后端，subagent 会写真实代码）。主流程只做编排：盘点 docs/specs/task-UCS 数量、控制待办；两阶段——先顺序逐一 subagent 实现所有 task-UCS（遵守 task-layer-rule 任务四要素、数据模型对齐 DB、按需 tools、编译通过），再顺序逐一 subagent 为所有 task-UCS 写测试（提取场景→选测试类型→覆盖矩阵→测试编译通过）；最后整体编译并确保测试脚本。当用户要实现异步任务代码或写测试时使用。
+disable-model-invocation: true
 ---
 
 # do-task

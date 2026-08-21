@@ -1,6 +1,7 @@
 ---
 name: ucs-api
 description: 接口用例规约（Use Case Specification，仅后端）。三阶段：①顺序 subagent 逐一读 docs/specs/API 生成 UCS 到 docs/specs/API-UCS；②顺序 subagent 逐一做 6 维度安全审查到 docs/specs/API-UCS-review；③顺序 subagent 读审查报告自行评估并按推荐修正 UCS。当用户要做接口用例规约、UCS、安全审查时使用。
+disable-model-invocation: true
 ---
 
 # ucs-api

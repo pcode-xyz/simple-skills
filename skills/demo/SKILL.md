@@ -1,6 +1,7 @@
 ---
 name: demo
 description: 产品思考梳理 + 风格化页面 demo。先通过问答摸清产品定位，产出 docs/product/sense.md 产品思考锚点，再按用户选择的风格用 HTML 做一组页面 demo（3 页 + 对比页）供参考。当用户想做产品 demo、原型、落地页、或需要理清产品方向时使用。
+disable-model-invocation: true
 ---
 
 # demo

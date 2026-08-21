@@ -1,6 +1,7 @@
 ---
 name: specs-ws
 description: WebSocket 协议定义（AsyncAPI 2.6，仅后端）。从 business-flow/demo 识别实时通道（聊天/推送/进度/状态广播），按"HTTP 承载命令查询、WS 承载事件流"的通道划分原则，逐模块顺序 subagent 生成 AsyncAPI yaml 到 docs/specs/ws/<模块>.yaml。当用户要做 WS 协议、实时通道、AsyncAPI 文档时使用。
+disable-model-invocation: true
 ---
 
 # specs-ws

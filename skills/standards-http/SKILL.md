@@ -1,6 +1,7 @@
 ---
 name: standards-http
 description: HTTP handler 请求流转说明（仅后端）。读 architecture 选型（tech-stack-rule.md 的选型上下文）+ 目录结构（directory-rule.md），展示确认后按架构风格选模板，构造"请求从 HTTP Handler/Controller 到数据库流转路径"的 prompt 用 subagent 执行，输出到 docs/standards/http-handler-rule.md + http-handler-draft.md 并登记 CLAUDE.md 清单。当用户想说明 HTTP handler 怎么写、请求怎么流转、接口实现规范时使用。
+disable-model-invocation: true
 ---
 
 # standards-http

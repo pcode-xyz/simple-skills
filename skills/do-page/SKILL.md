@@ -1,6 +1,7 @@
 ---
 name: do-page
 description: 页面开发（执行型，仅写页面的端，subagent 会写真实页面代码）。主流程只做编排：盘点 docs/specs/page-UCS 数量、控制待办任务、最后整体构建；每个页面由顺序逐一 subagent 按 page-UCS + demo + API 实现（组件库从 tech-stack-rule、dark/light 与 mock 跟已实现页面一致、先 mock 数据、单任务编译通过）。当用户要实现页面代码时使用。
+disable-model-invocation: true
 ---
 
 # do-page

@@ -1,6 +1,7 @@
 ---
 name: do-api
 description: 按 API-UCS 实现后端接口代码并编写测试（执行型，仅后端，subagent 会写真实代码）。主流程只做编排：盘点 docs/specs/API-UCS 数量、控制待办；两阶段——先顺序逐一 subagent 实现所有 UCS（路由对齐 API、数据模型对齐 DB、按需 tools、单任务编译通过），再顺序逐一 subagent 为所有 UCS 编写测试（从 UCS 提取场景→选测试类型→命名规范→覆盖矩阵→编译通过）；最后整体编译并更新测试脚本。当用户要实现接口代码或写测试时使用。
+disable-model-invocation: true
 ---
 
 # do-api

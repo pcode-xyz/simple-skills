@@ -1,6 +1,7 @@
 ---
 name: do-directory
 description: 按 standards 产出的文档创建项目目录并搭建最基础脚手架（执行型，会在磁盘创建文件）。读 tech-stack-rule.md / directory-rule.md / tools-rule.md（后端另读 http-handler-rule.md）→ 确认目标目录与选择 → 创建目录树 + 基础文件（入口/依赖清单/配置/路由/工具层占位/示例 handler）。当用户要真正初始化项目骨架、创建代码目录时使用。
+disable-model-invocation: true
 ---
 
 # do-directory

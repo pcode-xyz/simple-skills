@@ -1,6 +1,7 @@
 ---
 name: architecture
 description: 技术选型。先选端（前端/后端/App/桌面端/小程序），再按端选具体技术栈（每项预录一份自包含的推荐约束块、先给推荐等用户确认），后端额外定架构（薄层垂直切片/DDD/其他），然后构造"资深X架构师"选型 prompt 用 subagent 执行，输出技术栈总览到 docs/standards/tech-stack-rule.md + tech-stack-draft.md 并登记进 CLAUDE.md 约束清单。当用户要做技术选型、定技术栈、架构决策时使用。
+disable-model-invocation: true
 ---
 
 # architecture
