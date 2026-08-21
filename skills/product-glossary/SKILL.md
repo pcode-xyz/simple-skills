@@ -38,7 +38,7 @@ disable-model-invocation: true
 
 ### 2.2 每个页面起一个 subagent
 
-用 **Agent 工具**，对每个待对比页面并行起一个 subagent（general-purpose，只读、不改文件）。每个 subagent 的任务：
+用 **Agent 工具**，对每个待对比页面**顺序**起一个 subagent（general-purpose，只读、不改文件；逐个运行，前一个返回后再起下一个，不要并行）。每个 subagent 的任务：
 
 1. 用 Read 读该页面的 HTML 内容；
 2. 读 `docs/product/glossary.md`；
@@ -61,9 +61,10 @@ disable-model-invocation: true
   - 保留 glossary 现有定义
   - 两者都保留（页面用词标为别名）
 - 注意 AskUserQuestion 一次最多 4 问，多于 4 项分多次询问。
-- 采纳的更新进 `docs/product/glossary.md`；未采纳的在 glossary-different.md 对应行注明"未采纳"。
+- 采纳的更新进 `docs/product/glossary.md`；未采纳的不落文件，仅在汇总时说明。
+- **全部确认完后**：把每个分歧项的最终处理在对话中**汇总给用户**（分歧点 + 采纳页面用法 / 保留 glossary / 未采纳），然后**移除** `docs/product/glossary-different.md`（内容已汇总，不再保留文件）。
 
 ## 完成后
 
-- 报告三个文件路径与状态：glossary.md（基础 + 补充 + 已采纳）、glossary-different.md（分歧项 + 采纳结果）。
+- 报告 `docs/product/glossary.md`（基础 + 补充 + 已采纳）路径与状态；`glossary-different.md` 已在阶段 3 汇总后移除。
 - 提示下一步：运行 `specs-api` 定义接口（字段名用词汇表英文）。
