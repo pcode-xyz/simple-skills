@@ -100,4 +100,4 @@ gRPC 与 HTTP 共享前置依赖、Step 4 的顺序 subagent 生成方式与增�
 ## 完成后
 
 - 报告生成的 yaml / proto 文件清单。
-- 提示下一步：运行 `specs-db` 设计数据库（字段对齐接口），或 `specs-data` 定义显式结构。
+- 提示下一步：运行 `architecture` 技术选型（产出 tech-stack-rule.md，`specs-data` 的前置）。

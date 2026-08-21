@@ -52,4 +52,4 @@ disable-model-invocation: true
 ## 完成后
 
 - 报告：定义了哪些结构（按 6 类分组）、跳过了哪些候选。
-- 提示下一步：运行 `architecture` 技术选型（struct.md 供 do-* 模型引用，保证各端一致）。
+- 提示下一步：运行 `standards-directory` 目录结构设计（struct.md 供 do-* 模型引用，保证各端一致）。

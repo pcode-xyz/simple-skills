@@ -67,4 +67,4 @@ disable-model-invocation: true
 ## 完成后
 
 - 报告 `docs/product/glossary.md`（基础 + 补充 + 已采纳）路径与状态；`glossary-different.md` 已在阶段 3 汇总后移除。
-- 提示下一步：运行 `specs-api` 定义接口（字段名用词汇表英文）。
+- 提示下一步：运行 `specs-db` 设计数据库（字段名用词汇表英文）。

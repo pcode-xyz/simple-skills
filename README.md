@@ -95,7 +95,7 @@ claude plugin install simple@simple
 
 ### 2. 后端开发视角（完成 demo 后）
 
-product-business → product-glossary → specs-api → specs-db → specs-data → architecture → standards-directory → standards-http → standards-tools →（如需）standards-task → do-directory → do-db → ucs-api →（如需）ucs-task → do-api →（如需）do-task → tdd → docker
+product-business → product-glossary → specs-db → specs-api → architecture → specs-data → standards-directory → standards-http → standards-tools →（如需）standards-task → do-directory → do-db → ucs-api →（如需）ucs-task → do-api →（如需）do-task → tdd → docker
 
 ### 3. 前端开发视角（完成 demo 后）
 

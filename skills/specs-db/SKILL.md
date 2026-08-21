@@ -91,4 +91,4 @@ disable-model-invocation: true
 ## 完成后
 
 - 报告输出文件路径、表（或集合）清单。
-- 提示下一步：运行 `specs-data` 定义显式数据结构（DB JSON / 跨接口共享）。
+- 提示下一步：运行 `specs-api` 定义接口（随后 `architecture` → `specs-data`）。
