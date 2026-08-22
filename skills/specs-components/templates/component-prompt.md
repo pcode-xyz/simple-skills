@@ -10,7 +10,7 @@
     ## 项目信息（本任务只读这些文件）
 
     - demo 页面：docs/product/demo/<页面>.html（只读这一页）
-    - 共享组件类：docs/product/demo/css/style.css
+    - 共享组件类：<主流程注入的共享样式路径：独立 CSS 文件；若为内联样式，则从本页 <style> 中提取共享类>
     - 设计令牌：docs/specs/design/DESIGN.md（token 命名，组件节引用它，不重复定义视觉值）
     - 组件映射表：docs/specs/design/component-map-rule.md（taxonomy 基准）
     - 已累积组件清单：docs/specs/design/COMPONENTS.md（**存在才读**，即前面页面合并的结果）
@@ -41,7 +41,7 @@
     ## 提取要求
 
     - **归类不翻译**：组件一律用 component-map-rule.md 里的规范组件名；不写任何端组件名（el-button / SwiftUI / ElevatedButton 一律不出现）。
-    - **分离**：style.css 的共享组件类与本页复用的视觉模式 → 组件；本页独有布局块 → 不进清单。
+    - **分离**：共享样式（独立 CSS 或本页 `<style>`）的组件类与本页复用的视觉模式 → 组件；本页独有布局块 → 不进清单。
     - **两层分类**：通用可复用 → 基础组件（taxonomy 内）；带业务语义 → 领域组件（可新建，语义化命名）。
     - **token 引用**：颜色/字号/间距/圆角/阴影用 DESIGN.md 的 token 引用（`{colors.primary}`），不写具体 CSS 值。
     - **不越界**：不写像素级布局、不写页面级交互流（那是 ucs-page）、不写目标端代码。

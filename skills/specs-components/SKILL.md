@@ -19,7 +19,8 @@ disable-model-invocation: true
 
 ## 前置依赖（先检查，缺失就停）
 
-- 必须存在：`docs/product/demo/`（≥1 个页面 HTML）、`docs/product/demo/css/style.css`（共享组件类）、`docs/specs/design/DESIGN.md`（设计令牌，`specs-design` 产物）。
+- 必须存在：`docs/product/demo/`（≥1 个页面 HTML）、`docs/specs/design/DESIGN.md`（设计令牌，`specs-design` 产物）。
+- 共享样式来源：`docs/product/demo/` 下的独立 CSS 文件（`css/style.css` 或与页面同级，**Glob 定位**）；若无独立 CSS 文件，样式内联在各页面 `<style>` 中（按内联提取共享类）。
 - 建议存在：`docs/standards/tech-stack-rule.md`（目标端/框架，用于"适配要点"标注）、`docs/product/sense.md`（领域组件语义参考）。
 - 缺失必选项时，提示先运行 `demo` + `specs-design`，结束。
 
@@ -34,7 +35,7 @@ disable-model-invocation: true
 - `docs/specs/design/DESIGN.md`：token 命名（colors/typography/rounded/spacing/components），`COMPONENTS.md` 的 token 引用以它为准。
 - `docs/standards/tech-stack-rule.md`（存在才读）：目标端 / 框架，用于目标端标注与适配要点。
 - 列出 `docs/product/demo/` 下所有页面 HTML，**报告总数**。
-- 读 `docs/product/demo/css/style.css`：`:root` 设计令牌与共享组件类（组件候选来源）。
+- **定位共享样式来源**：Glob `docs/product/demo/**/*.css`；有独立 CSS → 读之（`:root` 设计令牌 + 共享组件类，组件候选来源）；无独立 CSS → 样式内联在各页 `<style>`，主流程向 subagent 注入"内联"标记，subagent 从本页 `<style>` 提取共享类。
 
 ## Step 2 — 确认范围（AskUserQuestion）
 
@@ -50,7 +51,7 @@ disable-model-invocation: true
 按确认页面清单**顺序**逐一执行，**不要并行、不要跳跃**——每个 subagent 读**当前已累积的 `COMPONENTS.md`**（前一页产物）后写回，并行会互相覆盖。**不用临时目录**：合并就在增量写回中完成，避免最后一个 subagent 一次性读全部临时文件而超上下文。
 
 每个 subagent 的 prompt 自包含（用 `templates/component-prompt.md`，Glob 定位）：
-1. **要读的文件**：**该页** HTML（`docs/product/demo/<页面>.html`）、`css/style.css`、`docs/specs/design/DESIGN.md`、`docs/specs/design/component-map-rule.md`（taxonomy）、`docs/specs/design/COMPONENTS.md`（**存在才读**，即前面页面累积的结果）、`docs/standards/tech-stack-rule.md`（存在才读；仅首个 subagent 用于初始化目标端）。
+1. **要读的文件**：**该页** HTML（`docs/product/demo/<页面>.html`）、共享样式来源（主流程注入的独立 CSS 路径；若为内联样式则只读该页 `<style>`）、`docs/specs/design/DESIGN.md`、`docs/specs/design/component-map-rule.md`（taxonomy）、`docs/specs/design/COMPONENTS.md`（**存在才读**，即前面页面累积的结果）、`docs/standards/tech-stack-rule.md`（存在才读；仅首个 subagent 用于初始化目标端）。
 2. **生成要求**：
    - `COMPONENTS.md` 不存在（首个页面）→ **初始化**：写 `## 目标端` + 适配要点 + `## 基础组件` / `## 领域组件` 大节 + 本页组件节；
    - `COMPONENTS.md` 已存在（后续页面）→ **读当前状态 → 增量合并 → 写回**：本页已有的组件在该组件"使用页面"追加本页、变体/尺寸/状态/数据取**并集**；本页新组件追加新节；本页独有布局块不进清单；**保留**既有头部与所有既有节，只改需要改的行。
