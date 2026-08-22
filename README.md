@@ -31,6 +31,7 @@ claude plugin install simple@simple
 | 命令 | 说明 |
 | --- | --- |
 | `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） |
+| `/simple:specs-design` | 设计元素提取：按 design.md 规范从 demo 提取设计系统（色板/字体/字号/间距/圆角/阴影/组件）→ docs/specs/design/DESIGN.md |
 | `/simple:product-business` | 基于 sense.md + demo 原型稿，用四色建模法梳理业务流程（business-flow.md） |
 | `/simple:product-glossary` | 统一语言词汇表：business-flow → glossary.md，subagent 逐页对比 demo，分歧/缺失处理 |
 
@@ -94,6 +95,7 @@ claude plugin install simple@simple
 ### 1. 单纯产品视角
 
 只需 `demo` — 产品思考梳理 + 风格化页面 demo，产出 sense.md + HTML demo 即可。
+如需把 demo 的设计沉淀为规范文档，追加 `specs-design` — 提取设计系统到 docs/specs/design/DESIGN.md。
 
 ### 2. 后端开发视角（完成 demo 后）
 
@@ -103,7 +105,7 @@ product-business → product-glossary → specs-db → specs-api → architectur
 
 ### 3. 前端开发视角（完成 demo 后）
 
-product-business → do-directory →（将后端 api 文档放入前端目录）→ ucs-page → do-page → 调通后让 AI 把 mock 切换为正式接口
+product-business → specs-design（提取设计系统）→ do-directory →（将后端 api 文档放入前端目录）→ ucs-page → do-page → 调通后让 AI 把 mock 切换为正式接口
 
 ### 4. 小程序
 
