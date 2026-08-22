@@ -1,6 +1,6 @@
 ---
 name: ucs-page
-description: 页面用例规约（Page UCS，仅写页面的端适用）。盘点 docs/product/demo 的页面生成编号任务清单，逐任务顺序 subagent：读该页面 HTML + docs/specs/API 接口 + page-ucs-template.md（组件库从 tech-stack-rule 取值），生成页面公约直接写入 docs/specs/page-UCS/<页面>.md。当用户要做页面公约、页面用例规约、页面组件与交互设计时使用。
+description: 页面用例规约（Page UCS，仅写页面的端适用）。盘点 docs/product/demo 的页面生成编号任务清单，逐任务顺序 subagent：读该页面 HTML + 接口明细（HTTP → docs/specs/API，gRPC → docs/specs/grpc）+ page-ucs-template.md（组件库从 tech-stack-rule 取值），生成页面公约直接写入 docs/specs/page-UCS/<页面>.md。当用户要做页面公约、页面用例规约、页面组件与交互设计时使用。
 disable-model-invocation: true
 ---
 
@@ -11,7 +11,12 @@ disable-model-invocation: true
 ## 前置依赖（先检查，缺失就停）
 
 - **非后端**：读 `docs/standards/tech-stack-rule.md` 的"选型上下文"，若**端 = 后端**，提示此 skill 只服务写页面的端，结束。
-- 必须存在：`docs/product/demo/`（≥1 个页面 HTML）、`docs/specs/API/`（接口明细）、`docs/standards/tech-stack-rule.md`（含组件库选型）。
+- **接口明细目录按协议分支**（HTTP 与 gRPC 互斥，只生成其一）：
+  - 存在 `docs/specs/API/` → 项目为 HTTP，接口明细目录 = `docs/specs/API/`；
+  - 存在 `docs/specs/grpc/` → 项目为 gRPC，接口明细目录 = `docs/specs/grpc/`；
+  - 两者皆无 → 接口明细缺失，提示先运行 `specs-api` 生成接口，结束；
+  - 两者皆有 → 以 `docs/standards/tech-stack-rule.md` 选型上下文为准，或询问用户。
+- 必须存在：`docs/product/demo/`（≥1 个页面 HTML）、`docs/standards/tech-stack-rule.md`（含组件库选型）。
 - 建议存在：`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/product/business-flow.md`。
 - 缺失必选项时，提示先运行对应 skill，结束。
 
@@ -25,7 +30,7 @@ disable-model-invocation: true
 - `tech-stack-rule.md`：**端**、**组件库**（模板 `{组件库}` 的取值）、技术栈。
 - `directory-rule.md`：组件/页面目录、通用组件位置。
 - `tools-rule.md`：页面如何调用请求工具（数据源引用）。
-- `docs/specs/API/`：接口明细（数据源引用）。
+- **接口明细目录**（HTTP → `docs/specs/API/`；gRPC → `docs/specs/grpc/`）：接口明细（数据源引用）。
 
 ## Step 2 — 盘点页面，生成任务清单
 
@@ -41,12 +46,12 @@ disable-model-invocation: true
 - 已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
 
 每个 subagent 的 prompt 必须**自包含**：
-1. **要读的文件**：该页面 HTML（`docs/product/demo/<页面>.html`）、页面公约模板（Glob 定位 `templates/page-ucs-template.md`）、相关接口 yaml（`docs/specs/API/` 下与页面数据相关的）、`docs/standards/tech-stack-rule.md`（组件库）。
+1. **要读的文件**：该页面 HTML（`docs/product/demo/<页面>.html`）、页面公约模板（Glob 定位 `templates/page-ucs-template.md`）、相关接口明细（按前置检查解析出的接口明细目录下与页面数据相关的：HTTP → `docs/specs/API/` 的 yaml，gRPC → `docs/specs/grpc/` 的 proto；**prompt 里写具体路径**）、`docs/standards/tech-stack-rule.md`（组件库）。
 2. **生成要求**：
    - **使用中文**；
    - 严格按 `templates/page-ucs-template.md` 结构逐节填写（URL / 数据源 / 组件树 / 组件调整 / 交互流）；
    - **组件库以 tech-stack-rule 选择的为准**，替换模板 `{组件库}` 占位；不用库外组件名；
-   - 数据源接口名/路径以 `docs/specs/API` 为准；字段对齐；
+   - 数据源接口名/路径以接口明细目录为准（HTTP → `docs/specs/API`；gRPC → `docs/specs/grpc`）；字段对齐；
    - 交互流覆盖：页面加载（骨架屏、并行/条件请求）、主操作（确认弹窗、调用、成功/失败处理）、边界场景（倒计时、状态刷新、禁用、重复提交）。
 3. **直接写入**：把页面公约写入确切路径 `docs/specs/page-UCS/<页面>.md`（先 `mkdir -p docs/specs/page-UCS`）；写完后报告写入路径与文件大小。
 
