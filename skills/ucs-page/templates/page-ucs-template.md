@@ -1,6 +1,6 @@
 # 页面用例规约（Page UCS Template）
 
-> 每个页面一份，按此结构逐节填写。组件名以 `docs/specs/design/COMPONENTS.md` 的规范组件为准（配方查 `docs/specs/design/component-map-rule.md`）；`COMPONENTS.md` 缺失时回退所选组件库（`{组件库}` 占位，如 Element Plus / Ant Design / TDesign / uni-ui 等）。
+> 每个页面一份，按此结构逐节填写。组件名以本页组件切片（`docs/specs/design/.slice/<页面>.md`，自 `COMPONENTS.md` 派生）的规范组件为准；无切片时回退所选组件库（`{组件库}` 占位，如 Element Plus / Ant Design / TDesign / uni-ui 等）。
 
 # {页面名}（{页面文件}）
 
@@ -45,7 +45,7 @@
 
 ## 写作原则
 
-- 组件名以 docs/specs/design/COMPONENTS.md 的规范组件为准（配方查 component-map-rule.md），不写库外组件名；COMPONENTS.md 缺失时以所选组件库（{组件库}）为准
+- 组件名以本页组件切片（docs/specs/design/.slice/<页面>.md）的规范组件为准，不写库外组件名；无切片时以所选组件库（{组件库}）为准
 - 数据源接口名/路径以 docs/specs/API 为准，字段对齐接口
 - 交互流覆盖：加载（骨架屏/并行/条件）、主操作（确认/调用/成功/失败）、边界场景
-- 组件调整只写"相对规范组件"的差异，不重复组件清单（COMPONENTS.md）内容
+- 组件调整只写"相对规范组件"的差异，不重复组件切片内容

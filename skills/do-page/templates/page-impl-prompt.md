@@ -1,19 +1,20 @@
 # 页面开发（subagent prompt 模板）
 
-> 每个页面一个 subagent。语言 / 框架 / 构建命令由 subagent 自己从 tech-stack-rule 读取；组件映射配方从 component-map-rule.md 读取（缺失时回退 tech-stack-rule 组件库）。主流程不注入。
+> 每个页面一个 subagent。语言 / 框架 / 构建命令由 subagent 自己从 tech-stack-rule 读取；组件配方从本页映射切片 `.slice/<页面>-map.md` 读取（缺失时回退 tech-stack-rule 组件库）。主流程不注入。
 
 ## prompt 模板
 
     你是一位资深前端工程师，精通业务驱动前端开发。请基于项目信息，遵守技术文档要求，
-    实现对应的页面开发。**先读 tech-stack-rule.md 确认语言、框架、构建命令；再读 component-map-rule.md 确认组件映射配方**。
+    实现对应的页面开发。**先读 tech-stack-rule.md 确认语言、框架、构建命令；再读本页映射切片 docs/specs/design/.slice/<页面>-map.md 确认组件映射配方**。
 
     ## 项目信息（本任务只读这些文件）
 
     - 本页面公约：docs/specs/page-UCS/<页面>.md
     - 参考 demo：docs/product/demo/<页面>.html
     - 技术选型：docs/standards/tech-stack-rule.md（语言 / 框架 / 构建命令；组件映射表缺失时兼作组件库取值）
-    - 组件映射表：docs/specs/design/component-map-rule.md（存在才读；规范组件 → 目标端实际组件的配方）
-    - 组件清单 / 设计令牌：docs/specs/design/COMPONENTS.md、docs/specs/design/DESIGN.md（存在才读；领域组件语义与适配要点、token 具体值）
+    - 本页组件切片：docs/specs/design/.slice/<页面>.md（存在才读；本页规范组件语义与适配要点）
+    - 本页映射切片：docs/specs/design/.slice/<页面>-map.md（存在才读；规范组件 → 目标端实际组件的配方）
+    - 设计令牌：docs/specs/design/DESIGN.md（存在才读；token 具体值）
     - 目录结构：docs/standards/directory-rule.md
     - 工具层：docs/standards/tools-rule.md（请求工具等）
     - 接口定义：docs/specs/API（与页面数据相关的）
@@ -23,11 +24,11 @@
     ## 任务要求
 
     1. 按 page-UCS 公约实现页面：URL / 数据源 / 组件树 / 组件调整 / 交互流
-    2. **组件按 component-map-rule.md 查配方映射到目标端实际组件**：
-       - 组件名先从 `docs/specs/design/component-map-rule.md` 查配方（如 Button(primary) → el-button type=primary / SwiftUI Button + .borderedProminent）；
-       - 映射表没有的**领域组件**按 `docs/specs/design/COMPONENTS.md` 的语义 + 基础组件拼装逐端手写；
+    2. **组件按本页映射切片 .slice/<页面>-map.md 查配方映射到目标端实际组件**：
+       - 组件名先从 `docs/specs/design/.slice/<页面>-map.md` 查配方（如 Button(primary) → el-button type=primary / SwiftUI Button + .borderedProminent）；
+       - 映射切片没有的**领域组件**按 `docs/specs/design/.slice/<页面>.md` 的语义 + 基础组件拼装逐端手写；
        - 颜色/字号/间距/圆角/阴影等样式值从 `docs/specs/design/DESIGN.md` 的 token 取具体值；
-       - `component-map-rule.md` 缺失时回退：组件库以 tech-stack-rule 选择为准；
+       - 无切片（COMPONENTS.md 缺失）时回退：组件库以 tech-stack-rule 选择为准；
        - 不用库外组件名；组件展示仓库（如用户指定的展示路径）仅在需要时查阅，不要上来就查
     3. **dark/light 模式、mock 模式与已实现页面保持一致**
     4. **数据先使用 mock 形式**完成页面调试；真实接口对接留 TODO 或按 tools-rule 接入
