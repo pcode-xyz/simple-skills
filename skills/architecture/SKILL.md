@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: 技术选型。先选端（前端/后端/App/桌面端/小程序），再按端选具体技术栈（每项预录一份自包含的推荐约束块、先给推荐等用户确认），后端额外定架构（薄层垂直切片/DDD/其他），然后构造"资深X架构师"选型 prompt 用 subagent 执行，输出技术栈总览到 docs/standards/tech-stack-rule.md + tech-stack-draft.md 并登记进 CLAUDE.md 约束清单。当用户要做技术选型、定技术栈、架构决策时使用。
+description: 技术选型。先选端（前端/后端/App/桌面端/小程序），再按端选具体技术栈（每项预录一份自包含的推荐约束块、先给推荐等用户确认），后端额外定架构（薄层垂直切片/DDD/其他），然后构造"资深X架构师"选型 prompt 用 subagent 执行，输出技术栈总览到 docs/standards/tech-stack-rule.md + tech-stack-draft.md 并登记进 CLAUDE.md 约束清单；完成后与本地环境对比（仅报告缺失组件/环境设置与补齐方式，不执行）。当用户要做技术选型、定技术栈、架构决策时使用。
 disable-model-invocation: true
 ---
 
@@ -122,7 +122,28 @@ AskUserQuestion：
 - 写 `docs/standards/tech-stack-draft.md`：每个选型理由 + 替代方案对比表（人工追溯用）。
 - 更新 `docs/standards/CLAUDE.md` 的"当前约束清单"表，补上 tech-stack 行（按 init-docs 的 CLAUDE.md 约定）。
 
+## Step 5 — 本地环境对比（仅报告，不执行）
+
+读 `docs/standards/tech-stack-rule.md` 技术栈总览表（类别 / 选型 / 版本），对每个选型**在本地环境逐一核对**（只读检查，用 `which` / `<cmd> --version`，不安装不配置）：
+
+- **语言 / 运行时**：按端核对其命令——后端（go / node / python / rustc…）、前端（node）、App（flutter / dart）、桌面端（node / cargo）等。
+- **包管理器 / 工具链**：npm / pnpm / yarn / go / cargo / flutter 等。
+- **中间件 / 服务**：MySQL / PostgreSQL / Redis / Docker 等——先 `which` 查命令是否存在，服务类再用 `--version` 或本地连通性判断是否可用。
+- 每项记录本地状态：**已装且版本匹配 / 已装但版本不符 / 未装**。
+
+汇总成**对比表**报告给用户：
+
+| 组件 | 方案选型 | 本地状态 | 缺失项补齐方式 |
+|---|---|---|---|
+| 运行时 | Go 1.2x | ✗ 未装 | `brew install go`（或下载 SDK） |
+| ORM | GORM | ✓ 随 Go 依赖 | — |
+| 数据库 | MySQL 8 | ✗ 未装 | `brew install mysql` + `brew services start mysql` |
+
+- **仅报告，不执行**：不安装、不配置任何组件；缺失项给出**补齐方式**（具体安装命令 / 配置步骤 / 环境变量 / `docker compose` 起中间件等）。
+- 报告完提示用户：如**明确需要帮助执行补齐**（下载 / 安装 / 配置），再说一声协助执行；否则止于报告。
+
 ## 完成后
 
 - 报告 `docs/standards/tech-stack-rule.md` 与 `tech-stack-draft.md` 路径。
+- 报告**本地环境对比结果**（Step 5）：缺失组件 / 环境设置清单 + 补齐方式（仅报告，未执行）。
 - 提示新约束已登记到 `docs/standards/CLAUDE.md` 清单；下一步运行 `standards-directory` 设计目录结构。

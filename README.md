@@ -82,6 +82,8 @@ claude plugin install simple@simple
 | 命令 | 说明 |
 | --- | --- |
 | `/simple:tdd` | 测试全绿修复：跑全量测试→逐失败修复（修代码不修测试）→重跑→直到全部通过 |
+| `/simple:review` | 代码质量审查（只报告，不改代码）：接口维度（DB 效率/安全/错误处理/契约漂移）+ 全库维度（环调用/孤儿代码/硬编码）→ 分级写 docs/review/issues.md，P0 对话呈现 |
+| `/simple:review-fix` | 按 issues.md 整改（执行型）：读 issues.md 与用户探讨范围/方案→登记任务（TaskCreate）顺序 subagent 修复→整体构建→归档 docs/review/ 到 archiving/{今日日期} |
 | `/simple:docker` | Docker 容器化部署：生成 Dockerfile/compose/readme-docker.md，覆盖日志/资源/卷/环境/DB 初始化 |
 
 ## 最佳实践顺序（按视角）
