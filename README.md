@@ -173,3 +173,12 @@ product-business → specs-design（提取设计系统）→ do-directory →（
 - 新增 skill：在 `skills/<skill-name>/SKILL.md` 写 frontmatter（`name`、`description`）+ 指令正文，并把路径加进 `.claude-plugin/plugin.json` 的 `skills` 数组。
 - 校验清单：`claude plugin validate .`
 - 发布：推到 GitHub 后 `claude plugin tag .` 打版本标签。
+
+## 致谢与灵感
+
+本技能集的「grilling 模式」与产品推演方法论，借鉴了以下开源项目，在此致谢：
+
+- [gstack（garrytan/gstack）](https://github.com/garrytan/gstack) — 前提挑战（Premise Challenge）、对抗式审查、完成度门禁、结论循环等思考机制，参考了其 `plan-ceo-review` 的思考姿势。
+- [grill-me（mattpocock/skills）](https://github.com/mattpocock/skills) — 一问一答、每问附推荐答案、「事实靠查、决策靠问」的 grilling 模式源自其 grill-me 技能。
+
+感谢这些作者对 AI 协作模式的探索与开源分享。
