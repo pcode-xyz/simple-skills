@@ -115,7 +115,35 @@ claude plugin install simple@simple
 
 ### 0. 初始化（所有场景前置）
 
-`init-docs` — 初始化项目文档目录结构（docs/ 完整子目录树）。
+`init-docs` — 初始化项目文档目录结构（docs/ 完整子目录树）。幂等、绝不破坏已有内容，所有场景的第一步都从它开始。
+
+#### 目录结构
+
+    docs/
+    ├── misc/           与项目开发无关的文档（会议纪要、随手记等）
+    ├── plans/          Claude Code 的 plan 生成文档存储目录
+    ├── product/        产品原型相关文档（sense.md、demo、glossary 等）
+    ├── specs/
+    │   ├── API/        接口协议文档（OpenAPI3.0）
+    │   ├── ws/         WS 协议文档（AsyncAPI 2.6）
+    │   ├── data/       数据结构及 DB 设计协议（struct.md、table.sql）
+    │   ├── API-UCS/    接口描述用户规约（验收用例）
+    │   ├── ws-UCS/     WS 协议描述用户规约
+    │   ├── task-UCS/   异步任务描述用户规约
+    │   └── tools-UCS/  工具层描述用户规约
+    ├── standards/      技术架构文档（约束层：AI 编码执行依据）
+    ├── templates/      项目参考模板（「抄哪个样板」）
+    └── prompt/         项目特有提示词
+
+#### 理念
+
+`init-docs` 定下的不是「文档放哪」，而是**「契约放哪、约束放哪」**——它是整条流水线的地基：
+
+- **docs/ 是唯一事实源**：AI 没有跨会话记忆，所有「想」的产物（产品/规格/UCS）固定落盘，subagent 读文档干活，不重新想、不重编。
+- **目录即流水线**：目录与流水线阶段一一对应——`product`（想清楚做什么）→ `specs`（定死契约）→ `standards`（怎么做）→ 执行型 skill（do-*）只消费这些目录。
+- **契约与约束分层**：`specs/` 定「做什么」（数据/接口/协议 + 验收 UCS），`standards/` 定「怎么做」（架构约束），`templates/` 给「抄哪个样板」——改需求只改 specs，改规范只改 standards，互不干扰。
+- **约束可追溯**：`docs/standards/CLAUDE.md` 是 AI 编码时的执行依据；约束用 `-rule.md`（直接照做）/ `-draft.md`（决策留痕）成对维护。
+- **幂等、绝不破坏**：只创建缺失的目录与模板，不删除、不重命名、不覆盖已有内容——初始化安全，可随时重跑。
 
 ### 1. 单纯产品视角
 
