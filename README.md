@@ -176,9 +176,11 @@ product-business → specs-design（提取设计系统）→ do-directory →（
 
 ## 致谢与灵感
 
-本技能集的「grilling 模式」与产品推演方法论，借鉴了以下开源项目，在此致谢：
+本仓库借鉴了以下开源项目与内容，在此致谢：
 
-- [gstack（garrytan/gstack）](https://github.com/garrytan/gstack) — 前提挑战（Premise Challenge）、对抗式审查、完成度门禁、结论循环等思考机制，参考了其 `plan-ceo-review` 的思考姿势。
-- [grill-me（mattpocock/skills）](https://github.com/mattpocock/skills) — 一问一答、每问附推荐答案、「事实靠查、决策靠问」的 grilling 模式源自其 grill-me 技能。
+- [gstack（garrytan/gstack）](https://github.com/garrytan/gstack) — `demo` 技能（Phase 1）：前提挑战（Premise Challenge）、对抗式审查、完成度门禁、结论循环等思考机制，参考了其 `plan-ceo-review` 的思考姿势。
+- [grill-me（mattpocock/skills）](https://github.com/mattpocock/skills) — `demo` 技能（Phase 1）：一问一答、每问附推荐答案、「事实靠查、决策靠问」的 grilling 模式源自其 grill-me 技能。
+- [taste-skill（leonxlnx/taste-skill）](https://github.com/leonxlnx/taste-skill) — `demo` 技能（Phase 2）：AI 味黑名单（`rules/ai-tells.md`）与性能/无障碍护栏（`rules/guardrails.md`），参考了其「给 AI 好审美、拒绝默认 AI 味」的思路。
+- 小红书 up 主 jpg（ID 490407598，120303469@qq.com）— `demo` 技能（Phase 2）：配色池（`palettes/`）的配色内容来自其分享。
 
-感谢这些作者对 AI 协作模式的探索与开源分享。
+感谢这些作者与创作者的探索与分享。
