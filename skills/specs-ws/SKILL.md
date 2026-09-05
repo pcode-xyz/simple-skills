@@ -1,6 +1,6 @@
 ---
 name: specs-ws
-description: WebSocket 协议定义（AsyncAPI 2.6，仅后端）。从 business-flow/demo 识别实时通道（聊天/推送/进度/状态广播），按"HTTP 承载命令查询、WS 承载事件流"的通道划分原则，逐模块顺序 subagent 生成 AsyncAPI yaml 到 docs/specs/ws/<模块>.yaml。当用户要做 WS 协议、实时通道、AsyncAPI 文档时使用。
+description: WebSocket 协议定义（AsyncAPI 2.6，仅后端）。从 business-flow/demo 识别实时通道（聊天/推送/进度/状态广播），按"HTTP 承载命令查询、WS 承载事件流"的通道划分原则，Workflow 逐模块并行子 agent 生成 AsyncAPI yaml 到 docs/specs/ws/<模块>.yaml。当用户要做 WS 协议、实时通道、AsyncAPI 文档时使用。
 disable-model-invocation: true
 ---
 
@@ -25,29 +25,26 @@ WebSocket 协议定义：识别实时通道 → 逐模块生成 AsyncAPI 2.6 yam
 - `business-flow.md` + `demo/`：识别实时通道场景——聊天、推送、进度事件、状态变更广播等。
 - `docs/specs/API/`：配套命令/查询（WS 事件流与 HTTP 的互补边界）。
 
-## Step 2 — 盘点通道模块，生成任务清单（主流程只做编排）
+## Step 2 — 盘点通道模块 + 前置闸门（主进程，启动 workflow 前一次性解决）
 
-- 把实时场景归组为**通道模块**，列出清单，**报告总数**。
-- 用 AskUserQuestion 请用户**确认待生成模块**（哪些做、哪些合并、哪些不做）。
-- 为每个待生成模块登记一个**待办/任务**：`任务N：<模块> → docs/specs/ws/<模块>.yaml`，得到**任务清单**。
-- **用待办事项分别登记并跟进**每个任务。
+- 把实时场景归组为**通道模块**，列出清单，**报告总数**；为每个模块记一句话「覆盖的实时通道」描述（供子 agent 聚焦），得 `moduleDescriptions`。
+- 用 AskUserQuestion 请用户**确认待生成模块**（哪些做、哪些合并、哪些不做），得 `modules`。
+- **文件闸门前置**：对每个模块检查 `docs/specs/ws/<模块>.yaml` 是否已存在：已存在 → AskUserQuestion 覆盖 / 备份后替换 / 跳过（备份由主进程做），得 `actions`（{模块: gen|skip}）。
+- **收集 args**：`modules`、`moduleDescriptions`、`outDir`（`docs/specs/ws`）、`language`（从 tech-stack-rule 取语言名）、`templates`（Read `**/skills/specs-ws/templates/ws-spec-prompt.md` 内容字符串）。
 
-## Step 3 — 逐任务顺序执行（每任务一个 subagent，直接落盘）
+## Step 3 — 启动 Workflow（逐模块并行，后台执行）
 
-按任务清单**顺序**逐一执行：每起一个 subagent 生成一个模块的 WS yaml；该任务完成并校验通过后，再处理下一个。**不要并行、不要跳跃。** 每个任务产出独立文件，由 **subagent 直接写入**。
+1. **定位脚本**：Glob `**/skills/specs-ws/scripts/specs-ws.workflow.js` 得绝对路径。
+2. **调用 Workflow 工具**（本 skill 使用 Workflow 工具做多 agent 编排；用户调用本 skill 即视为显式 opt-in，首次可能弹权限提示，放行）：`Workflow({ scriptPath: <绝对路径>, args: {...} })`，记录返回的 taskId。
+3. **等待 task-notification**（可用 `/workflows` 观察进度）。
 
-主流程在起 subagent **前**先检查目标文件是否已存在：
-- 已存在 → AskUserQuestion：覆盖 / 备份后替换 / 跳过（跳过则不起该 subagent）。
+> workflow 内部结构：Stage 单阶段**并行**每个模块一个子 agent：读 business-flow / tech-stack-rule / directory-rule / specs/API / demo / specs/data，按 ws-spec-prompt 模板输出 AsyncAPI 2.6，写 `docs/specs/ws/<模块>.yaml`，返回结构化元数据（channel_count）。`actions` 里 skip 的模块不生成；失败/跳过的模块随通知标出。
 
-每个 subagent 的 prompt 必须**自包含**（用 `templates/ws-spec-prompt.md`，Glob 定位）：
-1. **要读的文件**：`docs/product/business-flow.md`、`docs/standards/tech-stack-rule.md`（WS 中间件）、`docs/standards/directory-rule.md`、`docs/specs/API/`（配套）、`docs/product/demo/`（实时交互）、`docs/specs/data/`（字段对齐）。
-2. **生成要求**：按模板输出 AsyncAPI 2.6 yaml——通道划分原则（HTTP 命令/查询 vs WS 事件/流）、方向语义（subscribe=客户端→服务端、publish=服务端→客户端）、契约三要素（消息目录/生命周期/投递语义 x-delivery-semantics）、servers/channels(bindings+subscribe+publish)/components(messages+schemas)；字段对齐 DB、消息与 HTTP 历史同构、message_id 幂等、心跳 Ping/Pong、前向兼容。
-3. **直接写入**：写入确切路径 `docs/specs/ws/<模块>.yaml`（先 `mkdir -p docs/specs/ws`）；写完后报告写入路径与文件大小。
+## Step 4 — 通知到达后：校验 + 报告
 
-主流程（subagent 返回后）：
-- **校验**写入的文件：存在、结构符合 AsyncAPI 2.6（info/servers/channels/components）。异常则让该 subagent 重写或主流程修正。
+1. **校验**：抽查各模块 yaml 已写、结构符合 AsyncAPI 2.6（info/servers/channels/components，不轻信返回）。
+2. **报告**：生成 / 跳过 / 覆盖的 WS yaml 清单。
 
 ## 完成后
 
-- 报告：生成 / 跳过 / 覆盖的 WS yaml 清单。
-- 提示下一步：运行 `ucs-ws` 生成 WS 通道用例规约。
+- 提示下一步：运行 `/simple:ucs-ws` 生成 WS 通道用例规约。

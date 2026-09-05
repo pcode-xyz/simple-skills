@@ -100,6 +100,7 @@ claude plugin install simple@simple
 - **编码前定契约**：接口 / 数据结构 / 组件 / 目录树先在文档里定死，改需求只改文档，不返工改代码。
 - **防模型自由发挥**：每个 skill 带前置依赖硬检查（缺产物就停、提示先跑上游）；执行型 skill 从 spec 提取「确定清单」，不许自行增删（如 `do-db` 只建 spec 内的表、绝不 DROP）。
 - **上下文有限**：顺序 subagent + 逐页切片，一次只喂一部分，避免一次塞进整个项目导致质量下降。
+- **批处理用 Workflow 编排**：`review` / `specs-api-review` / `ucs-api` / `ucs-grpc` / `ucs-page` / `specs-ws` / `specs-design`（3B）/ `product-glossary`（阶段2）的批量阶段改为 Workflow 驱动（脚本在 `skills/<name>/scripts/*.workflow.js`：并行子 agent + schema 结构化返回 + 汇总 agent），主进程只收集参数、启动 workflow、等通知后读产物报告；交互闸门（AskUser 范围 / 文件已存在）仍在主进程。仅适用于「每项独立、无共享写」的批处理；`do-*` 等共享代码库的 skill 保持顺序。
 - **质量前置**：先写 UCS 验收用例，再做实现；最后 tdd 全绿 + review 审查 + review-fix 整改闭环。
 
 **好处**

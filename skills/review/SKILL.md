@@ -27,33 +27,27 @@ disable-model-invocation: true
 - 接口清单：按协议分支解析接口定义目录，列出接口总数。
 - 确认目标项目根（默认当前工作目录）。
 
-## Step 2 — 接口 + 全库维度并行审查（subagent 各自写独立 raw 文件）
+## Step 2 — 启动 Workflow（并行审查 + 汇总，后台执行）
 
-接口维度与全库维度**互不依赖、只读、各写独立的 raw 文件**，可**并行发起**：
+主进程只做收集参数与启动，**不读任何业务代码 / raw 文件**（避免上下文超限）；代码审读由 workflow 内子 agent 自行完成：
 
-- **接口维度**（每接口一个 subagent，`templates/review-interface-prompt.md`）：按接口清单**并行发起**多个 subagent，同时审多个接口。每个 subagent 读：该接口定义（HTTP yaml / gRPC proto）+ 对应 API-UCS（存在才读）+ 该接口 handler/实现代码（按 directory-rule 定位）+ tech-stack-rule（ORM/框架/校验库）+ docs/specs/data/struct.md（存在才读）。审（明显的才报）：
-  1. **DB 效率**：N+1（for 循环内查 DB）/ 缺索引 / 无分页 / 批量逐条 / 重复查询无缓存 / 复杂 JOIN / 事务内慢查询 / Raw SQL 拼接
-  2. **安全**：参数校验（长度/空值/格式/枚举白名单）/ 注入（SQL/XSS/命令/路径穿越/SSRF）/ 登录态校验 / 所属权校验（IDOR）/ CORS 限流上传 / 敏感信息落日志
-  3. **错误处理与事务**：吞错 / 错误不分业务码 / DB 错裸抛 500 / 多写不包事务 / 失败无回滚
-  4. **幂等与并发**：重复提交无幂等键 / 共享状态无锁 / 资源生命周期泄漏 / 无超时控制
-  5. **契约漂移与遗漏**：返回字段与接口定义/struct.md 不一致；该接口定义但实现缺失 / 找不到对应 handler
-  - 写 `docs/review/raw/interface-<接口>.md`（每问题一行，格式见模板），报告该接口问题数。
-- **全库维度**（1 个 subagent，`templates/review-global-prompt.md`）：与接口维度**并行发起**。先跑静态工具（按 tech-stack-rule 可用命令，确定性收集证据），再人工审：环调用（包 import 环 / 模块互相依赖 / 构造器 DI 环 / 可疑递归 / 前端组件环）、孤儿代码（unused 符号/导入 / 死文件 / 不可达分支 / 失效中间件）、硬编码敏感信息（密钥/token/密码 / localhost 内网 IP）、文件过大（单源文件超过 300 行，排除 docs 目录 / 自动生成 / 纯数据 / 配置）。写 `docs/review/raw/global.md`，报告问题数。
+1. **准备 args**：
+   - `interfaces`：`ls` 接口定义目录所得**文件名数组**（HTTP → `docs/specs/API/*.yaml`；gRPC → `docs/specs/grpc/*.proto`，接口粒度 = proto 文件，一个文件一个子 agent、审文件内全部方法）；
+   - `protocolDir`：接口定义目录（`docs/specs/API` 或 `docs/specs/grpc`）；
+   - `rawDir`：`docs/review/raw`；`issuesPath`：`docs/review/issues.md`；
+   - `templates`：Read 三个模板文件内容字符串（Glob 定位 `**/skills/review/templates/review-interface-prompt.md` / `review-global-prompt.md` / `review-merge-prompt.md`）。
+2. **定位脚本**：Glob `**/skills/review/scripts/review.workflow.js` 得绝对路径。
+3. **调用 Workflow 工具**（本 skill 使用 Workflow 工具做多 agent 编排；用户调用本 skill 即视为显式 opt-in，首次可能弹权限提示，放行）：`Workflow({ scriptPath: <绝对路径>, args: {...} })`，记录返回的 taskId。
+4. **等待 task-notification**（期间不做其他大动作；可用 `/workflows` 观察进度）。
 
-主流程轻量校验每个返回的 subagent：确认 raw 文件已写、报告了问题数。
+> workflow 内部结构：Stage1 **并行**——接口维度每接口一个子 agent（按 `templates/review-interface-prompt.md` 的 5 维清单审：DB 效率/安全/错误处理与事务/幂等与并发/契约漂移与遗漏）+ 全库维度一个子 agent（先跑静态工具再人工审环调用/孤儿代码/硬编码/文件过大）。两者只读不改、各写独立 raw 存档文件（`docs/review/raw/interface-<接口>.md` / `global.md`）+ 返回结构化发现（severity/file/line/desc/reason/suggestion/uncertain），无共享写冲突。Stage2 一个汇总子 agent **只读 schema**（不解析 raw）去重分级写 `docs/review/issues.md`。失败的接口/维度不会静默消失——随通知 `skipped` 标出。
 
-> **为什么可并行**：review 只读不改代码，每个 subagent 只写自己独立的 raw 文件（`interface-<接口>.md` / `global.md`），无共享写冲突——与 do-* 的「顺序执行防共享文件冲突」约束不同，这里并行安全。
+## Step 3 — 通知到达后：校验 + 清理 + 报告
 
-## Step 3 — 汇总分级（等全部 raw 就绪后，1 个 subagent，review-merge-prompt）
-
-**Step 2 的全部 subagent 完成后**再起（汇总需读全部 raw 文件，是并行批的汇聚点）。用 `templates/review-merge-prompt.md`：
-- 读 `docs/review/raw/*.md` 全部 + tech-stack-rule（判断严重度/误报）；
-- **去重**（同根因跨接口合并）→ **复核分级**（P0 阻断 / P1 高 / P2 中 / P3 低）→ 按严重度组织写入 `docs/review/issues.md`（**全量**）；
-- **返回摘要**：各严重度数量 + **P0 明细清单**（文件:行号 + 简述）。
-
-主流程（汇总 subagent 返回后）：删除 `docs/review/raw/` 目录。
+1. **校验**：确认 `docs/review/issues.md` 已写、头部严重度统计完整（不轻信 workflow 返回）。
+2. **清理**：删除 `docs/review/raw/` 目录（raw 仅传输存档，汇总后即删）。
+3. **报告**：审查了哪些接口 / 维度、各严重度问题数、**P0 明细**（读 issues.md 的 P0 分组呈现）、`skipped` 未纳入审查的维度（如有）。
 
 ## 完成后
 
-- 报告：审查了哪些接口 / 维度、各严重度问题数、**P0 明细（对话呈现）**、`docs/review/issues.md` 路径。
-- 提示：issues.md 为全量分级清单，P0 需优先处理；确认后可按清单逐项修复（review 本身不改代码）。
+- 提示：`docs/review/issues.md` 为全量分级清单（Step 3 已报告 P0），P0 需优先处理；确认后运行 `/simple:review-fix` 按清单逐项修复（review 本身不改代码）。

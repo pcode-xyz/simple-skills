@@ -36,20 +36,17 @@ disable-model-invocation: true
 - 列出 `docs/product/demo/` 下所有 HTML 页面，报告总数。
 - 用 AskUserQuestion 请用户**排除与原型无关的页面**（如 index.html 对比壳页、纯样式试水页等），得到待对比页面清单。
 
-### 2.2 每个页面起一个 subagent
+### 2.2 逐页并行对比（Workflow，只读）
 
-用 **Agent 工具**，对每个待对比页面**顺序**起一个 subagent（general-purpose，只读、不改文件；逐个运行，前一个返回后再起下一个，不要并行）。每个 subagent 的任务：
+- **收集 args**：`pages`（去 `.html`）、`demoDir`（`docs/product/demo`）、`glossaryPath`（`docs/product/glossary.md`）。
+- **启动 Workflow**：Glob `**/skills/product-glossary/scripts/product-glossary.workflow.js` 得绝对路径；调用 `Workflow({ scriptPath, args })`（本 skill 使用 Workflow 工具做多 agent 编排；用户调用本 skill 即视为显式 opt-in，首次可能弹权限提示，放行）；等待 task-notification（可用 `/workflows` 观察进度）。
+- **收结果**：workflow 返回每个页面的结构化发现——分歧项 `{term, page_usage, glossary_def, point}` + 缺失项 `{term, page_meaning, suggested_scope, suggested_english}`，以及失败页面清单（如有则报告并决定是否重跑）。
 
-1. 用 Read 读该页面的 HTML 内容；
-2. 读 `docs/product/glossary.md`；
-3. 返回**结构化发现**（不要修改任何文件），分两类：
-   - **分歧项**：页面里出现、且 glossary 中有类似业务含义但表述/定义不同的词 → `{term, 页面用法, glossary 定义, 分歧点}`
-   - **缺失项**：页面出现的业务概念在 glossary 中没有 → `{term, 页面含义, 建议适用范围, 建议英文}`
-4. 只返回清单，不写文件、不跑其他命令。
+> workflow 内部：每个页面一个子 agent，只读（Read 该页 HTML + glossary.md），不写文件、不跑其他命令；返回 schema 校验的结构化发现。
 
 ### 2.3 汇总结果
 
-等所有 subagent 完成后：
+等 workflow 返回所有页面的发现后：
 - **分歧项** → 写入 `docs/product/glossary-different.md`（表格：词汇 | 页面用法 | glossary 定义 | 分歧点）。
 - **缺失项** → 直接补充进 `docs/product/glossary.md`（新增行，备注"来源：demo 页面"）。
 

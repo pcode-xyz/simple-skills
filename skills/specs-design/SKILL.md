@@ -49,19 +49,13 @@ disable-model-invocation: true
   3. **直接写入**：`docs/specs/design/DESIGN.md`（先 `mkdir -p docs/specs/design`）；写完报告写入路径与文件大小。
 - 若 demo 页面过多（超过一个 subagent 上下文），提示改用 3B 每页模式。
 
-### 3B. 每页一份（顺序 subagent 直接落盘）
+### 3B. 每页一份（Workflow 逐页并行）
 
-- 为每个待处理页面登记**任务**：`任务N：<页面>.html → docs/specs/design/DESIGN-<页面>.md`，得到**任务清单**。
-- 按任务清单**顺序**逐一执行，**不要并行、不要跳跃**；主流程在起 subagent 前先检查目标文件是否已存在：已存在 → AskUserQuestion（覆盖 / 备份后替换 / 跳过，跳过则不起该 subagent）。
-- 每个 subagent 的 prompt 必须**自包含**（用模板）：
-  1. **要读的文件**：该页 HTML（只读这一页）＋ 共享样式来源（独立 CSS 路径，主流程注入；若为内联样式则读该页 `<style>`）＋ `docs/product/sense.md`。
-  2. **生成要求**：按模板产出该页 DESIGN.md——共享令牌基座从共享样式（独立 CSS 或内联）提取，页面特有组件/样式归入 components，Overview 描述该页语境。
-  3. **直接写入**：`docs/specs/design/DESIGN-<页面>.md`（先 `mkdir -p docs/specs/design`）；写完报告写入路径与文件大小。
-
-主流程（subagent 返回后）：
-- **校验**写入的文件：frontmatter 合法（`---` 围栏、colors/typography/rounded/spacing/components 结构正确）、正文必需节存在且顺序正确、令牌引用 `{path}` 有效。异常则让该 subagent 重写或主流程修正。
+- **闸门前置**：为每个待处理页面检查 `docs/specs/design/DESIGN-<页面>.md` 是否已存在：已存在 → AskUserQuestion（覆盖 / 备份后替换 / 跳过，备份由主进程做），得 `actions`（{页面: gen|skip}）。
+- **收集 args**：`pages`（去 `.html`）、`demoDir`（`docs/product/demo`）、`cssPath`（Glob 定位到的独立 CSS 路径；无独立 CSS 则省略走内联标记）、`senseMd`（`docs/product/sense.md`）、`outDir`（`docs/specs/design`）、`templates`（Read `**/skills/specs-design/templates/design-md-prompt.md` 内容字符串）。
+- **启动 Workflow**：Glob `**/skills/specs-design/scripts/specs-design.workflow.js` 得绝对路径；调用 `Workflow({ scriptPath, args })`（本 skill 使用 Workflow 工具做多 agent 编排；用户调用本 skill 即视为显式 opt-in，首次可能弹权限提示，放行）；等待 task-notification（可用 `/workflows` 观察进度）。
+- **通知到达后**：抽查各页 DESIGN 文件已写、frontmatter 合法（`---` 围栏、colors/typography/rounded/spacing/components 结构正确）、正文必需节顺序正确（不轻信返回）；报告生成 / 跳过 / 覆盖清单。
 
 ## 完成后
 
-- 报告：生成 / 跳过 / 覆盖的 DESIGN.md 文件清单。
-- 提示下一步：前端视角运行 `ucs-page` → `do-page`（页面实现可引用本设计系统）；如需调整风格，迭代 `demo`。
+- 提示下一步：前端视角运行 `/simple:ucs-page` → `/simple:do-page`（页面实现可引用本设计系统）；如需调整风格，迭代 `/simple:demo`。
