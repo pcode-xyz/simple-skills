@@ -1,6 +1,6 @@
 ---
 name: specs-api
-description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准 RESTful 或只用 GET/POST，按统一 code/data/message 规范，用顺序 subagent 逐页从 demo 页面生成接口，按模块增量合并到 docs/specs/API/模块.yaml（gRPC → docs/specs/grpc/模块.proto）。当用户要做接口设计、API 定义、OpenAPI 文档、proto 定义时使用。
+description: 接口定义。先让用户选 HTTP 还是 gRPC；HTTP 再选标准 RESTful 或只用 GET/POST，按统一 code/data/message 规范，用顺序 subagent 逐页从 demo 页面生成接口，按模块增量合并到 docs/specs/API/模块.yaml（gRPC → docs/specs/grpc/模块.proto）；全部接口完成后用一个 subagent 自检接口设计（单一职责/命名歧义/跨模块一致性）→ docs/specs/review/api-design-review.md。当用户要做接口设计、API 定义、OpenAPI 文档、proto 定义时使用。
 disable-model-invocation: true
 ---
 
@@ -21,7 +21,7 @@ disable-model-invocation: true
 
 选 HTTP 则进入 Step 2 选风格；选 gRPC 直接跳到 Step 5。
 
-> **HTTP 与 gRPC 是互斥路径，只走一条**：选 HTTP → 只执行 Step 2/3/4，到 Step 4 结束；选 gRPC → 只执行 Step 5，到 Step 5 结束。**严禁在完成所选路径后继续执行另一条**（HTTP 路径不得接着跑 Step 5；反之亦然）。
+> **HTTP 与 gRPC 是互斥路径，只走一条**：选 HTTP → 执行 Step 2/3/4，生成完毕进入 Step 6 自检；选 gRPC → 执行 Step 5，生成完毕进入 Step 6 自检。**严禁在完成所选路径后继续执行另一条**（HTTP 路径不得接着跑 Step 5；反之亦然）。Step 6 两条路径共用。
 
 ## Step 2 — 选 HTTP 风格（AskUserQuestion）
 
@@ -77,7 +77,7 @@ disable-model-invocation: true
 - **维护已注册模块清单**：把各 subagent 摘要里的模块名累积登记，起下一个 subagent 时作为「命名参考」传入（是数据，不是规范，不违背 prompt 自包含），跨页命名保持一致。
 - 将每页摘要（新增/复用接口、模块文件）报告给用户。
 
-> **（HTTP 路径至此结束）** 本 skill 完成，不要继续执行 Step 5（gRPC）。
+> **（HTTP 生成至此结束）** 进入 Step 6 接口设计自检；不要继续执行 Step 5（gRPC）。
 
 ## Step 5 — gRPC 接口生成（subagent，逐页直接落盘）
 
@@ -109,9 +109,26 @@ disable-model-invocation: true
 - **维护已注册模块清单**：把各 subagent 摘要里的模块名累积登记，起下一个 subagent 时作为「命名参考」传入（是数据，不是规范，不违背 prompt 自包含），跨页命名保持一致。
 - 将每页摘要（新增/复用 RPC、模块 proto）报告给用户。
 
-> **（gRPC 路径至此结束）** 本 skill 完成。
+> **（gRPC 生成至此结束）** 进入 Step 6 接口设计自检。
+
+## Step 6 — 接口设计自检（全部接口完成后，1 个 subagent）
+
+> 生成阶段的质量兜底：接口设计质量（单一职责/命名歧义/跨模块一致性）在生成时检查最便宜，这是本 skill 的自检门。需要**跨模块视野**，因此**一个 subagent 通读全部模块文件**，不按模块拆。
+
+起一个 subagent，prompt 必须**自包含**——
+
+1. **要读的文件**：接口定义目录下**全部**模块文件（HTTP → `docs/specs/API/*.yaml`；gRPC → `docs/specs/grpc/*.proto`；`ls` 列出逐个读）。
+2. **检查维度**（只查这些，逐接口/逐模块，每个结论 = **判断 → 证据（引用具体行/字段）→ 影响 → 建议**）：
+   - **单一职责**：一个接口是否只做一件事？聚合接口把哪些职责揉在一起？拆 vs 合的利弊？
+   - **命名歧义**：`List/Get/Add`（gRPC）或路径/方法（HTTP）语义是否统一？`status`/`type` 等字段取值含义是否含糊？`code` 语义是否全项目统一？`user_id` 与 token 双轨是否有歧义？
+   - **跨模块一致性**：不同模块对同一业务概念的命名/字段/`code` 语义是否打架？
+   - **不做**：性能（无实现站不住）、页面满足度（那是 `specs-api-review`）、DB 一致性（那是 `review`/`specs-data`）、死接口（开发后 `review`）。
+3. **写文件**：`mkdir -p docs/specs/review`；写入 `docs/specs/review/api-design-review.md`（每接口/每模块一节 + 末尾「跨模块问题」节）；文件已存在先问用户：覆盖 / 备份后替换 / 另存。
+4. **返回摘要**：问题总数 + 明显问题清单（含跨模块冲突），不返回完整评审。
+
+主流程：报告 `api-design-review.md` 路径 + 问题摘要，问用户是否按发现修复（走 specs-api 增量改，或直接改文件）。
 
 ## 完成后
 
-- 报告生成的 yaml / proto 文件清单。
-- 提示下一步：运行 `architecture` 技术选型（产出 tech-stack-rule.md，`specs-data` 的前置）。
+- 报告生成的 yaml / proto 文件清单、`docs/specs/review/api-design-review.md`（自检结果）路径与问题摘要。
+- 提示下一步：确认自检发现是否修复；随后运行 `architecture` 技术选型（产出 tech-stack-rule.md，`specs-data` 的前置）。
