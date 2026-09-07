@@ -20,6 +20,13 @@ claude plugin install simple@simple
 
 安装后命令前缀为 `simple`，例如 `/simple:init-docs`。
 
+## 环境要求
+
+- **Claude Code CLI ≥ 2.1.154**（2026-05 引入 Workflow）。使用 Workflow 驱动的 skill（`review` / `specs-api-mock` / `ucs-api` / `ucs-grpc` / `ucs-page` / `specs-ws` / `specs-design` 的 3B 每页模式 / `product-glossary` 的阶段 2）**硬性要求此版本**——低于它会因缺少 Workflow 工具而报错，不会降级回旧的 subagent 流程。
+- **推荐 ≥ 2.1.248**：内置 `/workflow-authoring` 写作辅助 + 完整 ultracode 体验；至少 ≥ 2.1.203（`/effort ultracode` 模式）。
+- **模型**：非硬性门槛。Workflow 子 agent 的模型解析链 = 脚本显式指定 → 子 agent frontmatter → `CLAUDE_CODE_SUBAGENT_MODEL` 环境变量 → 兜底主会话模型。若设置了 `CLAUDE_CODE_SUBAGENT_MODEL`，子 agent 会用它而非主模型（重活想用更强模型，可在 workflow 脚本的 `agent()` 里显式指定 `model`）。
+- **权限**：调用带 Workflow 指令的 skill 即视为对多 agent 编排的显式 opt-in；首次运行可能弹权限提示，放行即可。
+
 ## 技能列表
 
 按流水线阶段分组，命令前缀 `simple`（如 `/simple:init-docs`）。
@@ -55,7 +62,7 @@ claude plugin install simple@simple
 | `/simple:specs-db` | 数据库设计：选 DB 类型（推荐），MySQL 9 条规范生成 table.sql，其他 DB 适配 | ✅ |
 | `/simple:specs-data` | 数据结构定义：可靠性视角识别显式结构（DB JSON/跨接口共享/载荷/外部契约）→ struct.md | |
 | `/simple:specs-api` | 接口定义：选 HTTP(OpenAPI3.0 → docs/specs/API/) / gRPC(proto3 → docs/specs/grpc/)；HTTP 再选标准 RESTful 或只用 GET/POST；顺序 subagent 逐页生成，按模块合并 | ✅ |
-| `/simple:specs-api-review` | 接口满足度评审（前端视角，只报告）：并行页面 subagent 判断接口是否满足各 demo 页（covered/placeholder/pure_client/gap）→ 增量聚合共享接口需求调和 + 缺口/风险，驱动接口升级改造（HTTP/gRPC 双分支）→ docs/specs/review/frontend-page-review.md | |
+| `/simple:specs-api-mock` | 接口 Mock 层生成 + demo 接线 + 满足度对照：契约子 agent 按接口定义（gRPC/HTTP）生成 api-mock.js（契约字段、流式订阅、状态化 store，demo 真实数据 1:1 播种）→ 并行页面对照（数据访问 → RPC/字段，covered/未接线/gap/pure_client）→ 单写接线复制页面换脚本全走 api-mock + 接口格式校验循环 → 汇总写 docs/specs/review/mock-compare.md 人话决策单（含跨接口总览，demo-mock/ file:// 直开）。取代已退役的 specs-api-review | |
 | `/simple:specs-ws` | WS 协议定义（AsyncAPI 2.6，仅后端）：识别实时通道→顺序 subagent 生成 → docs/specs/ws/ | |
 
 ### 用例规约（UCS）
@@ -100,7 +107,7 @@ claude plugin install simple@simple
 - **编码前定契约**：接口 / 数据结构 / 组件 / 目录树先在文档里定死，改需求只改文档，不返工改代码。
 - **防模型自由发挥**：每个 skill 带前置依赖硬检查（缺产物就停、提示先跑上游）；执行型 skill 从 spec 提取「确定清单」，不许自行增删（如 `do-db` 只建 spec 内的表、绝不 DROP）。
 - **上下文有限**：顺序 subagent + 逐页切片，一次只喂一部分，避免一次塞进整个项目导致质量下降。
-- **批处理用 Workflow 编排**：`review` / `specs-api-review` / `ucs-api` / `ucs-grpc` / `ucs-page` / `specs-ws` / `specs-design`（3B）/ `product-glossary`（阶段2）的批量阶段改为 Workflow 驱动（脚本在 `skills/<name>/scripts/*.workflow.js`：并行子 agent + schema 结构化返回 + 汇总 agent），主进程只收集参数、启动 workflow、等通知后读产物报告；交互闸门（AskUser 范围 / 文件已存在）仍在主进程。仅适用于「每项独立、无共享写」的批处理；`do-*` 等共享代码库的 skill 保持顺序。
+- **批处理用 Workflow 编排**：`review` / `specs-api-mock` / `ucs-api` / `ucs-grpc` / `ucs-page` / `specs-ws` / `specs-design`（3B）/ `product-glossary`（阶段2）的批量阶段改为 Workflow 驱动（脚本在 `skills/<name>/scripts/*.workflow.js`：并行子 agent + schema 结构化返回 + 汇总 agent），主进程只收集参数、启动 workflow、等通知后读产物报告；交互闸门（AskUser 范围 / 文件已存在）仍在主进程。仅适用于「每项独立、无共享写」的批处理；`do-*` 等共享代码库的 skill 保持顺序。
 - **质量前置**：先写 UCS 验收用例，再做实现；最后 tdd 全绿 + review 审查 + review-fix 整改闭环。
 
 **好处**

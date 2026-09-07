@@ -122,7 +122,7 @@ disable-model-invocation: true
    - **单一职责**：一个接口是否只做一件事？聚合接口把哪些职责揉在一起？拆 vs 合的利弊？
    - **命名歧义**：`List/Get/Add`（gRPC）或路径/方法（HTTP）语义是否统一？`status`/`type` 等字段取值含义是否含糊？`code` 语义是否全项目统一？`user_id` 与 token 双轨是否有歧义？
    - **跨模块一致性**：不同模块对同一业务概念的命名/字段/`code` 语义是否打架？
-   - **不做**：性能（无实现站不住）、页面满足度（那是 `specs-api-review`）、DB 一致性（那是 `review`/`specs-data`）、死接口（开发后 `review`）。
+   - **不做**：性能（无实现站不住）、页面满足度（那是 `specs-api-mock` 的对照）、DB 一致性（那是 `review`/`specs-data`）、死接口（开发后 `review`）。
 3. **写文件**：`mkdir -p docs/specs/review`；写入 `docs/specs/review/api-design-review.md`（每接口/每模块一节 + 末尾「跨模块问题」节）；文件已存在先问用户：覆盖 / 备份后替换 / 另存。
 4. **返回摘要**：问题总数 + 明显问题清单（含跨模块冲突），不返回完整评审。
 

@@ -1,0 +1,453 @@
+<!doctype html>
+<!-- demo-review.html — demo-mock 接口实时 Review 面板
+     左侧 iframe 嵌入 demo-mock 业务页（数据全部经 api-mock.js），
+     右侧实时显示该页发送/收到的每个 RPC 请求与响应（以及流式事件）。
+     原理：页面里的 api-spy.js 把 window.api.* 包装成双向上报，postMessage 到这里。
+     file:// 直开可用，无服务器无网络。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>demo-mock 接口 Review</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 13px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #141518; color: #cdd0d6; overflow: hidden;
+  }
+  button, select, input { font: inherit; color: inherit; }
+
+  /* ---- 顶栏 ---- */
+  #toolbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 46px; z-index: 20;
+    display: flex; align-items: center; gap: 8px; padding: 0 12px;
+    background: #1b1d21; border-bottom: 1px solid #2c2e33;
+  }
+  #toolbar .brand { font-weight: 600; color: #e8eaf0; margin-right: 6px; white-space: nowrap; }
+  #toolbar select {
+    background: #25272c; border: 1px solid #3a3d44; border-radius: 6px;
+    padding: 4px 8px; max-width: 130px;
+  }
+  #toolbar button {
+    background: #25272c; border: 1px solid #3a3d44; border-radius: 6px;
+    padding: 4px 12px; cursor: pointer;
+  }
+  #toolbar button:hover { background: #2f3238; }
+  #toolbar label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #9aa0a8; white-space: nowrap; }
+  #filter { width: 150px; background: #25272c; border: 1px solid #3a3d44; border-radius: 6px; padding: 4px 8px; }
+  #statusDot { width: 9px; height: 9px; border-radius: 50%; background: #4d5157; display: inline-block; }
+  #statusDot.on  { background: #4cd964; box-shadow: 0 0 6px #4cd96488; }
+  #statusDot.off { background: #ff6b6b; }
+  #status { font-size: 12px; color: #9aa0a8; white-space: nowrap; }
+  #stats { margin-left: auto; font-size: 12px; color: #9aa0a8; white-space: nowrap; }
+  #stats b { color: #e8eaf0; }
+
+  /* ---- 舞台：左 iframe 右 流量 ---- */
+  #stage { position: fixed; top: 46px; left: 0; right: 0; bottom: 0; display: flex; }
+  #frameWrap { flex: 1 1 62%; min-width: 0; display: flex; flex-direction: column; background: #fff; }
+  #frameHint {
+    padding: 3px 10px; font-size: 12px; color: #7a7f87; background: #f4f5f7;
+    border-bottom: 1px solid #e2e3e6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  iframe { flex: 1; border: 0; background: #fff; }
+
+  /* ---- 设备尺寸预览（devtools 式居中设备框） ---- */
+  #frameWrap.device { display: block; overflow: auto; background: #e2e4e8; }
+  #frameWrap.device #frameHint { position: sticky; top: 0; z-index: 3; }
+  #frameWrap.device iframe {
+    display: block; margin: 18px auto;
+    width: var(--dev-w, 393px); height: var(--dev-h, 852px);
+    max-width: calc(100% - 8px);
+    box-shadow: 0 0 0 1px #c6c9cf, 0 12px 36px rgba(0, 0, 0, .25);
+  }
+
+  /* ---- 右侧流量面板 ---- */
+  #trace {
+    flex: 1 1 38%; min-width: 360px; max-width: 720px;
+    border-left: 1px solid #2c2e33; background: #16181b;
+    overflow-y: auto; overflow-x: hidden;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  #trace .empty { padding: 40px 20px; text-align: center; color: #6b7078; line-height: 2; }
+  #trace .empty .big { font-size: 14px; color: #9aa0a8; }
+
+  .group { position: sticky; top: 0; z-index: 5; background: #1e2024; padding: 5px 12px; font-size: 11px; letter-spacing: .5px; color: #8a8f98; border-bottom: 1px solid #2c2e33; }
+  .group .n { color: #4a9eff; }
+
+  .entry { border-bottom: 1px solid #26282d; }
+  .entry .hd {
+    display: flex; align-items: center; gap: 8px; padding: 6px 12px; cursor: pointer;
+    user-select: none; min-width: 0;
+  }
+  .entry .hd:hover { background: #1d2024; }
+  .entry .dir { width: 14px; text-align: center; font-weight: 700; }
+  .entry .dir.up  { color: #f0a35e; }
+  .entry .dir.down{ color: #4a9eff; }
+  .entry .dir.sub { color: #b18cff; }
+  .entry .phase { font-size: 10px; padding: 1px 6px; border-radius: 8px; color: #9aa0a8; background: #26282d; white-space: nowrap; }
+  .entry .phase.open { color: #ffd479; background: #3a3323; }
+  .entry .phase.interact { color: #7ce38b; background: #1f3523; }
+  .entry .op { color: #e8eaf0; font-weight: 600; white-space: nowrap; }
+  .entry .caller { color: #7b8088; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .entry .meta { margin-left: auto; color: #7b8088; font-size: 11px; white-space: nowrap; }
+  .entry .meta .ok { color: #4cd964; }
+  .entry .meta .fail { color: #ff6b6b; }
+  .entry .tw { color: #5a5f67; transition: transform .12s; }
+  .entry.open .tw { transform: rotate(90deg); }
+  .entry .bd { display: none; padding: 2px 12px 10px; }
+  .entry.open .bd { display: block; }
+  .part { margin-top: 8px; }
+  .part .pl { font-size: 10px; color: #9aa0a8; letter-spacing: .4px; margin-bottom: 3px; }
+  .part pre {
+    margin: 0; padding: 8px 10px; background: #1c1e22; border: 1px solid #2a2c31; border-radius: 6px;
+    max-height: 220px; overflow: auto; white-space: pre-wrap; word-break: break-word; color: #c6cad2;
+  }
+  .part pre.err { border-color: #5a2b2b; color: #ff9a9a; }
+
+  .push { display: flex; gap: 8px; align-items: baseline; padding: 2px 0; border-bottom: 1px dashed #22252a; }
+  .push .idx { color: #5a5f67; }
+  .push .kind { padding: 0 5px; border-radius: 5px; font-size: 10px; background: #25272c; white-space: nowrap; }
+  .push .kind.thinking { color: #ffd479; }
+  .push .kind.message  { color: #7ce38b; }
+  .push .kind.card     { color: #4a9eff; }
+  .push .kind.error    { color: #ff6b6b; }
+  .push .txt { color: #b8bcc4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+
+  .foot { padding: 14px; text-align: center; color: #5a5f67; font-size: 11px; }
+
+  @media (max-width: 900px) {
+    #stage { flex-direction: column; }
+    #frameWrap { flex: 1 1 45%; }
+    #trace { flex: 1 1 55%; max-width: none; border-left: 0; border-top: 1px solid #2c2e33; }
+    #stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <span class="brand">demo-mock · 接口 Review</span>
+  <select id="pageSel"></select>
+  <select id="deviceSel" title="预览设备尺寸"></select>
+  <button id="reload" title="重新打开当前页">↻ 重新打开</button>
+  <button id="clear">清空日志</button>
+  <label title="新事件自动滚到底部"><input type="checkbox" id="autoscroll" checked> 自动滚动</label>
+  <input id="filter" placeholder="过滤 op，如 SendMessage" title="按 RPC 名过滤">
+  <span id="statusDot"></span><span id="status">未连接</span>
+  <span id="stats"></span>
+</div>
+
+<div id="stage">
+  <div id="frameWrap">
+    <div id="frameHint">提示：在左侧页面上点击按钮 / 发送消息 / 保存设置，右侧会实时显示对应的 RPC 请求与响应。</div>
+    <iframe id="frame" title="demo-mock 页面"></iframe>
+  </div>
+  <div id="trace"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var PAGES = __PAGES_JSON__;   // 生成时替换为业务页名 JSON 数组（无则留空数组）
+
+  var $ = function (s) { return document.querySelector(s); };
+  var frame = $('#frame'), trace = $('#trace'), pageSel = $('#pageSel'), filter = $('#filter');
+
+  // PAGES -> option
+  PAGES.forEach(function (p) {
+    var o = document.createElement('option');
+    o.value = p; o.textContent = p + '.html';
+    pageSel.appendChild(o);
+  });
+
+  // 设备尺寸（0 = 自适应）。demo 为 520px 手机壳设计，切尺寸即真实手机预览
+  var HINT_DEFAULT = '提示：在左侧页面上点击按钮 / 发送消息 / 保存设置，右侧会实时显示对应的 RPC 请求与响应。';
+  var DEVICES = [
+    { label: '自适应', w: 0, h: 0 },
+    { label: 'iPhone 14 Pro · 393×852', w: 393, h: 852 },
+    { label: 'iPhone 14 Pro Max · 430×932', w: 430, h: 932 },
+    { label: 'iPhone 15 / 14 · 390×844', w: 390, h: 844 },
+    { label: 'iPhone SE (3rd) · 375×667', w: 375, h: 667 },
+    { label: 'Android 中端 · 360×800', w: 360, h: 800 },
+    { label: '平板竖屏 · 768×1024', w: 768, h: 1024 }
+  ];
+  var deviceSel = $('#deviceSel');
+  DEVICES.forEach(function (d, i) {
+    var o = document.createElement('option');
+    o.value = i; o.textContent = d.label;
+    deviceSel.appendChild(o);
+  });
+  function applyDevice() {
+    var d = DEVICES[+deviceSel.value] || DEVICES[0];
+    var wrap = $('#frameWrap');
+    if (d.w === 0) {
+      wrap.classList.remove('device');
+      wrap.style.removeProperty('--dev-w');
+      wrap.style.removeProperty('--dev-h');
+      $('#frameHint').textContent = HINT_DEFAULT;
+    } else {
+      wrap.classList.add('device');
+      wrap.style.setProperty('--dev-w', d.w + 'px');
+      wrap.style.setProperty('--dev-h', d.h + 'px');
+      $('#frameHint').textContent = '设备 ' + d.w + ' × ' + d.h + ' px · ' + HINT_DEFAULT;
+    }
+  }
+  deviceSel.addEventListener('change', applyDevice);
+
+  var reqs = new Map();   // id -> entry（unary）
+  var subs = new Map();   // id -> entry（流式）
+  var stats = { req: 0, res: 0, err: 0, sub: 0, push: 0 };
+  var lastPhase = null;
+  var firstT = null, lastT = null;
+  var ready = false;
+
+  /* ---------- 流量面板渲染 ---------- */
+
+  function fmtT(t) {
+    if (firstT == null) firstT = t;
+    var d = Math.round(t - firstT);
+    return (d >= 0 ? '+' : '') + (d / 1000).toFixed(2) + 's';
+  }
+  function deltaT(t) {
+    var d = lastT == null ? 0 : Math.round(t - lastT);
+    lastT = t;
+    return (d >= 0 ? '+' : '') + d + 'ms';
+  }
+  function pretty(x) {
+    try { return JSON.stringify(x, null, 2); } catch (e) { return String(x); }
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function groupHeader(ph) {
+    var g = document.createElement('div');
+    g.className = 'group';
+    g.textContent = ph === 'interact' ? '▍交互请求' : '▍页面打开时（boot / preload 首屏）';
+    trace.appendChild(g);
+    lastPhase = ph;
+  }
+  function ensureGroup(ph) {
+    if (lastPhase !== ph) groupHeader(ph);
+  }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function part(label, content, isErr) {
+    var p = el('div', 'part');
+    p.appendChild(el('div', 'pl', label));
+    var pre = el('pre', isErr ? 'err' : '');
+    pre.textContent = content;
+    p.appendChild(pre);
+    return p;
+  }
+
+  function addReqEntry(e, page) {
+    ensureGroup(e.phase);
+    var entry = el('div', 'entry');
+    entry.dataset.op = e.service + '.' + e.op;
+    entry.dataset.phase = e.phase;
+    var hd = el('div', 'hd');
+    hd.appendChild(el('span', 'dir up', '↑'));
+    hd.appendChild(el('span', 'phase ' + e.phase, e.phase === 'interact' ? '交互' : '打开'));
+    hd.appendChild(el('span', 'op', e.service + '.' + e.op));
+    hd.appendChild(el('span', 'caller', e.caller || ''));
+    var meta = el('span', 'meta');
+    meta.dataset.role = 'meta';
+    meta.textContent = fmtT(e.t) + ' · ' + deltaT(e.t) + ' · 等待…';
+    hd.appendChild(meta);
+    hd.appendChild(el('span', 'tw', '▸'));
+    var bd = el('div', 'bd');
+    bd.appendChild(part('请求（发送）', pretty(e.args), false));
+    entry.appendChild(hd); entry.appendChild(bd);
+    trace.appendChild(entry);
+    scrollBottom();
+    return entry;
+  }
+
+  function finalizeReq(entry, e) {
+    var meta = entry.querySelector('[data-role="meta"]');
+    var bd = entry.querySelector('.bd');
+    if (e.dir === 'res') {
+      meta.textContent = fmtT(e.t) + ' · ' + (e.dur != null ? '≤' + e.dur + 'ms' : '') + ' · ✓';
+      bd.appendChild(part('响应（收到）', pretty(e.resp), false));
+      entry.querySelector('.dir').className = 'dir down';
+      entry.querySelector('.dir').textContent = '↓';
+      stats.res++;
+    } else {
+      meta.textContent = fmtT(e.t) + ' · ✗ ' + (e.error || 'error');
+      bd.appendChild(part('错误', e.error, true));
+      entry.querySelector('.dir').className = 'dir down';
+      entry.querySelector('.dir').textContent = '↓';
+      stats.err++;
+    }
+    renderStats();
+    scrollBottom();
+  }
+
+  function summarizeEvent(evt) {
+    if (!evt) return ['?', ''];
+    var k = Object.keys(evt).filter(function (x) { return x !== '__unserializable__'; })[0] || '?';
+    var v = evt[k];
+    if (k === 'thinking') return [k, typeof v === 'object' ? (v.status || '思考中') : v];
+    if (k === 'message') { var m = v || {}; return [k, '[' + (m.msg_type || '?') + '] ' + (m.text || '').slice(0, 60)]; }
+    if (k === 'card') return [k, 'card ' + (v && (v.card_id || v.title) || '')];
+    if (k === 'error') return [k, v && (v.reason || v.message) || '错误'];
+    return [k, pretty(v).slice(0, 60)];
+  }
+
+  function addSubEntry(e, page) {
+    ensureGroup(e.phase);
+    var entry = el('div', 'entry sub');
+    entry.dataset.op = e.service + '.' + e.op;
+    entry.dataset.phase = e.phase;
+    var hd = el('div', 'hd');
+    hd.appendChild(el('span', 'dir sub', '⇄'));
+    hd.appendChild(el('span', 'phase ' + e.phase, e.phase === 'interact' ? '交互' : '打开'));
+    hd.appendChild(el('span', 'op', e.service + '.' + e.op));
+    hd.appendChild(el('span', 'caller', e.caller || ''));
+    var meta = el('span', 'meta');
+    meta.dataset.role = 'meta';
+    meta.textContent = fmtT(e.t) + ' · 订阅中…';
+    hd.appendChild(meta);
+    hd.appendChild(el('span', 'tw', '▸'));
+    var bd = el('div', 'bd');
+    bd.appendChild(part('订阅请求', pretty(e.args), false));
+    var stream = el('div', 'stream');
+    bd.appendChild(stream);
+    entry.appendChild(hd); entry.appendChild(bd);
+    trace.appendChild(entry);
+    scrollBottom();
+    return entry;
+  }
+
+  function addPushLine(subEntry, e) {
+    var stream = subEntry.querySelector('.stream');
+    if (!stream) return;
+    var kind, txt;
+    try { var r = summarizeEvent(e.event); kind = r[0]; txt = r[1]; } catch (x) { kind = '?'; txt = ''; }
+    var line = el('div', 'push');
+    line.appendChild(el('span', 'idx', '#' + e.idx));
+    line.appendChild(el('span', 'kind ' + kind, kind));
+    line.appendChild(el('span', 'txt', txt));
+    stream.appendChild(line);
+    stats.push++;
+    var meta = subEntry.querySelector('[data-role="meta"]');
+    meta.textContent = fmtT(e.t) + ' · ' + (e.idx + 1) + ' 事件';
+    renderStats();
+    scrollBottom();
+  }
+
+  function markUnsub(subEntry, e) {
+    var meta = subEntry.querySelector('[data-role="meta"]');
+    if (meta) meta.textContent = fmtT(e.t) + ' · 已退订';
+  }
+
+  /* ---------- 消息入口 ---------- */
+  window.addEventListener('message', function (ev) {
+    if (ev.source !== frame.contentWindow) return;
+    var d = ev.data;
+    if (!d || d.source !== 'api-spy') return;
+    if (d.kind === 'ready') {
+      ready = true;
+      setStatus(true, '侦查已接入 ✓ ' + d.page);
+      if (trace.querySelector('.entry')) {              // 非首个页面（iframe 内跳转/切换）
+        var g = el('div', 'group');
+        g.textContent = '▍→ 新页面 ' + d.page + ' 打开';
+        trace.appendChild(g);
+      }
+      lastPhase = null; firstT = null; lastT = null;    // 换页后时基重置（iframe 新 document）
+      return;
+    }
+    var e = d.event;
+    if (!e) return;
+    e.phase = e.phase || d.phase;   // 相位由消息顶层携带（spy 在 message.phase）
+    if (e.dir === 'req') { stats.req++; reqs.set(e.id, addReqEntry(e, d.page)); renderStats(); }
+    else if (e.dir === 'res' || e.dir === 'err') { var r = reqs.get(e.id); if (r) finalizeReq(r, e); }
+    else if (e.dir === 'sub') { stats.sub++; subs.set(e.id, addSubEntry(e, d.page)); renderStats(); }
+    else if (e.dir === 'push') { var s = subs.get(e.id); if (s) addPushLine(s, e); }
+    else if (e.dir === 'unsub') { var s2 = subs.get(e.id); if (s2) markUnsub(s2, e); }
+  }, false);
+
+  /* ---------- 控制 ---------- */
+  function clearLog() {
+    trace.innerHTML = '';
+    reqs.clear(); subs.clear();
+    stats = { req: 0, res: 0, err: 0, sub: 0, push: 0 };
+    lastPhase = null; firstT = null; lastT = null;
+    renderStats();
+    showEmpty('等待请求…');
+  }
+
+  function showEmpty(msg) {
+    if (trace.querySelector('.entry')) return;
+    trace.innerHTML = '';
+    var d = el('div', 'empty');
+    d.innerHTML = '<div class="big">' + (msg || '') + '</div>' +
+      '页面打开时发出的 RPC 会实时显示在右侧。<br>' +
+      '点击左侧页面上的按钮 / 发送消息 / 保存，触发新请求也会即时出现。';
+    trace.appendChild(d);
+  }
+
+  function setStatus(on, text) {
+    var dot = $('#statusDot'), st = $('#status');
+    dot.className = on ? 'on' : 'off';
+    st.textContent = text;
+  }
+
+  function renderStats() {
+    $('#stats').innerHTML = '请求 <b>' + stats.req + '</b> · 响应 <b>' + stats.res +
+      '</b>' + (stats.err ? ' · 失败 <b style="color:#ff6b6b">' + stats.err + '</b>' : '') +
+      ' · 订阅 <b>' + stats.sub + '</b> · 流事件 <b>' + stats.push + '</b>';
+  }
+
+  function scrollBottom() {
+    if ($('#autoscroll').checked) trace.scrollTop = trace.scrollHeight;
+  }
+
+  function loadPage(name) {
+    clearLog();
+    ready = false;
+    setStatus(false, '加载 ' + name + '.html …');
+    frame.src = name + '.html';
+  }
+
+  pageSel.addEventListener('change', function () { loadPage(pageSel.value); });
+  $('#reload').addEventListener('click', function () { loadPage(pageSel.value); });
+  $('#clear').addEventListener('click', clearLog);
+
+  // 点击标题展开/折叠
+  trace.addEventListener('click', function (ev) {
+    var hd = ev.target.closest ? ev.target.closest('.hd') : null;
+    if (!hd) return;
+    hd.parentElement.classList.toggle('open');
+  });
+
+  // 过滤
+  filter.addEventListener('input', function () {
+    var q = filter.value.trim().toLowerCase();
+    trace.querySelectorAll('.entry').forEach(function (en) {
+      var hit = !q || (en.dataset.op || '').toLowerCase().indexOf(q) !== -1;
+      en.style.display = hit ? '' : 'none';
+    });
+  });
+
+  // 首次加载默认页
+  frame.addEventListener('load', function () {
+    if (!ready) setStatus(true, '页面已加载 · 等待侦查握手…');
+    else setStatus(true, '侦查已接入 ✓ ' + pageSel.value + '.html');
+  });
+
+  applyDevice();
+  loadPage(PAGES[0] || 'index');   // 默认加载业务页首元素（无业务页时兜底 index）
+})();
+</script>
+</body>
+</html>
