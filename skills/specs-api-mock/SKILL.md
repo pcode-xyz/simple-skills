@@ -1,6 +1,6 @@
 ---
 name: specs-api-mock
-description: 接口 Mock 层生成 + demo 接线（demo 真实数据 → 契约 1:1 mock）：契约子 agent 读项目全部接口定义（gRPC proto / HTTP yaml，运行时自行发现）生成 api-mock.js（契约字段命名、流式接口订阅推送、状态化内存 store + localStorage/window.name 镜像），数据从 demo 实际数据按「demo 字段 → 契约字段」映射播种；并行页面子 agent 只读盘点每页数据访问 → 契约 RPC/字段（covered / 未接线 / gap / pure_client）写 map 存档；接线子 agent 单写把 demo 共享数据层改为「异步预载缓存 + 同步渲染」、复制页面换脚本全走 api-mock.js；独立校验子 agent 逐调用点核对 app-mock.js 的 api.* 与接口定义严格一致，不一致循环修正到一致（上限 3 轮）；汇总子 agent 聚合写 docs/specs/review/mock-compare.md 决策单；随后自动生成 demo-review 接口看板（iframe 嵌入业务页 + 实时 RPC 请求/响应面板 + 设备尺寸预览，模板化、任何项目复用）。产出 docs/product/demo-mock/（file:// 直开、无服务器、无网络）。当用户要做接口 mock、demo 接契约、mock 接口层生成、页面走 mock 接口、接口联调前预演时使用。
+description: 接口 Mock 层生成 + demo 接线（demo 真实数据 → 契约 1:1 mock）：契约子 agent 读项目全部接口定义（gRPC proto / HTTP yaml，运行时自行发现）生成 api-mock.js（契约字段命名、流式接口订阅推送、状态化内存 store + localStorage/window.name 镜像），数据从 demo 实际数据按「demo 字段 → 契约字段」映射播种；并行页面子 agent 只读盘点每页数据访问 → 契约 RPC/字段（covered / 未接线 / gap / pure_client）写 map 存档；接线子 agent 单写把 demo 共享数据层改为「异步预载缓存 + 同步渲染」、复制页面换脚本全走 api-mock.js；独立校验子 agent 逐调用点核对 app-mock.js 的 api.* 与接口定义严格一致，不一致循环修正到一致（上限 3 轮）；汇总子 agent 聚合写 docs/specs/review/mock-compare.md 决策单；随后自动生成 demo-review 接口看板（iframe 嵌入业务页 + 实时 RPC 请求/响应面板 + 设备尺寸预览 + 点击接口联动高亮页面对应区域，模板化、任何项目复用）。产出 docs/product/demo-mock/（file:// 直开、无服务器、无网络）。当用户要做接口 mock、demo 接契约、mock 接口层生成、页面走 mock 接口、接口联调前预演时使用。
 disable-model-invocation: true
 ---
 
@@ -57,7 +57,7 @@ disable-model-invocation: true
 
 ## Step 4 — 生成 demo-review 接口看板（自动，机械步骤，主 agent 直接执行）
 
-接线完成后，自动生成「接口实时 Review 看板」：左侧 iframe 嵌入业务页（可切设备尺寸），右侧实时显示打开页面时与点击按钮触发的每个 RPC 请求/响应（含流式事件）。**任何项目通用**——api-spy 只依赖 mock 层固定形状 `window.api.<service>.<rpc>`，与具体服务无关；看板页唯一项目相关项是页面清单，由模板占位符填充。本步**不读接口定义 / demo JS / 页面 HTML**，只做文件级操作。
+接线完成后，自动生成「接口实时 Review 看板」：左侧 iframe 嵌入业务页（可切设备尺寸），右侧实时显示打开页面时与点击按钮触发的每个 RPC 请求/响应（含流式事件）；**点击右侧接口条目会联动高亮左侧页面上该接口喂出来的内容区**（由接线阶段在页面上打的 `data-rpc="<service.op>"` 出处标记驱动，见 Step 3 / p3-rewire-prompt；未打标记的页面该项为 0 命中）。**任何项目通用**——api-spy 只依赖 mock 层固定形状 `window.api.<service>.<rpc>` 与 `data-rpc` 标记约定，与具体服务无关；看板页唯一项目相关项是页面清单，由模板占位符填充。本步**不读接口定义 / demo JS / 页面 HTML**，只做文件级操作。
 
 模板（Glob 定位）：`**/skills/specs-api-mock/templates/api-spy.js`、`**/skills/specs-api-mock/templates/demo-review.html`（后者含占位符 `__PAGES_JSON__`）。
 
@@ -79,6 +79,7 @@ disable-model-invocation: true
 
 - 提示 `demo-mock/` 可直接 file:// 打开预览（数据流经 api-mock.js，无服务器无网络）。
 - **接口 Review 看板**：`demo-mock/demo-review.html` file:// 直开——左侧选页 / 切设备尺寸（iPhone 等预设），右侧实时显示打开页面时与点击触发的每个 RPC 请求/响应（含流式事件、caller 定位、open/交互分组）。
+- **联动高亮**：点右侧任一接口条目（或勾选工具栏「联动高亮」时点标题）→ 左侧页面上该接口喂出来的内容区（带 `data-rpc` 标记）整体描边变色并滚到视野，再点同一条取消；「清除高亮」按钮一键还原。区域级命中，靠接线阶段打的 `data-rpc="<service.op>"` 出处标记（页面 HTML 静态容器 / app-mock.js 动态模板根），未标记的纯 UI 区不打。
 - **看板主题 light/dark**：跟随浏览器 `prefers-color-scheme`，在 DevTools `Cmd+Shift+P → Emulate CSS prefers-color-scheme` 切换（页面内按钮无法驱动浏览器模拟）。
 - **缺口工作清单驱动后续接口补充**：对照/接线产出的 gap（契约缺 RPC/字段）→ 按清单运行 `/simple:specs-api` 增量补/改接口，改完重跑本 skill 复核。
 - 接真实后端时：把 `api-mock.js` 的实现换成 fetch/gRPC 客户端即可——mock 层与页面接线解耦，页面不用再改。

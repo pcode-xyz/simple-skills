@@ -126,4 +126,39 @@
     if (svc === '_reset' || svc === '_dump') return;
     if (api[svc] && typeof api[svc] === 'object') wrapService(svc, api[svc]);
   });
+
+  /* ---------- 高亮联动：父面板 highlight 命令 → 命中 data-rpc 区域加 .rpc-hot ----------
+   * 页面内容区带 data-rpc="<service.op>"（空格分隔多值）标记出处；面板点击 trace 条目
+   * 发 {source:'demo-review', cmd:'highlight', op} 过来，这里命中变色 + 滚到视野，
+   * 回执 {source:'api-spy', kind:'highlighted', op, count} 供面板显示命中数。 */
+  var hlStyle = document.createElement('style');
+  hlStyle.textContent = '.rpc-hot{outline:2px solid #4a9eff!important;outline-offset:-2px;' +
+    'background:rgba(74,158,255,.14)!important;border-radius:6px;transition:background .2s}' +
+    '@keyframes rpc-pulse{0%{box-shadow:0 0 0 0 rgba(74,158,255,.45)}100%{box-shadow:0 0 0 14px rgba(74,158,255,0)}}' +
+    '.rpc-hot{animation:rpc-pulse .9s ease-out}';
+  document.head.appendChild(hlStyle);
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data;
+    if (!d || d.source !== 'demo-review') return;
+    var prev = document.querySelectorAll('.rpc-hot');
+    for (var i = 0; i < prev.length; i++) prev[i].classList.remove('rpc-hot');
+    if (d.cmd === 'highlight') {
+      var els = document.querySelectorAll('[data-rpc~="' + d.op + '"]');
+      for (var j = 0; j < els.length; j++) els[j].classList.add('rpc-hot');
+      if (els.length) {
+        // 仅当目标在视口外才滚动（block:nearest 最小位移）——居中底部小元素会把
+        // overflow:hidden 容器滚乱、把屏幕外的弹层带进视口；已在视口内则不动。
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        var r0 = els[0].getBoundingClientRect();
+        var inView = r0.top >= 0 && r0.bottom <= vh;
+        if (!inView && els[0].scrollIntoView) {
+          try { els[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) { try { els[0].scrollIntoView(true); } catch (e2) {} }
+        }
+      }
+      window.parent.postMessage({ source: 'api-spy', kind: 'highlighted', op: d.op, count: els.length }, '*');
+    } else if (d.cmd === 'clear-highlight') {
+      window.parent.postMessage({ source: 'api-spy', kind: 'highlighted', op: '', count: 0 }, '*');
+    }
+  }, false);
 })();

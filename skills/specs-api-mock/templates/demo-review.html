@@ -132,6 +132,9 @@
   <button id="reload" title="重新打开当前页">↻ 重新打开</button>
   <button id="clear">清空日志</button>
   <label title="新事件自动滚到底部"><input type="checkbox" id="autoscroll" checked> 自动滚动</label>
+  <label title="点击接口时高亮页面对应区域"><input type="checkbox" id="linkhigh" checked> 联动高亮</label>
+  <button id="clearHl" title="清除页面高亮">清除高亮</button>
+  <span id="hlInfo"></span>
   <input id="filter" placeholder="过滤 op，如 SendMessage" title="按 RPC 名过滤">
   <span id="statusDot"></span><span id="status">未连接</span>
   <span id="stats"></span>
@@ -366,6 +369,10 @@
       lastPhase = null; firstT = null; lastT = null;    // 换页后时基重置（iframe 新 document）
       return;
     }
+    if (d.kind === 'highlighted') {                      // 高亮回执：显示命中数
+      $('#hlInfo').textContent = d.count ? ('高亮 ' + d.count + ' 处 · ' + d.op) : '';
+      return;
+    }
     var e = d.event;
     if (!e) return;
     e.phase = e.phase || d.phase;   // 相位由消息顶层携带（spy 在 message.phase）
@@ -414,6 +421,7 @@
 
   function loadPage(name) {
     clearLog();
+    clearHighlight();
     ready = false;
     setStatus(false, '加载 ' + name + '.html …');
     frame.src = name + '.html';
@@ -423,11 +431,27 @@
   $('#reload').addEventListener('click', function () { loadPage(pageSel.value); });
   $('#clear').addEventListener('click', clearLog);
 
-  // 点击标题展开/折叠
+  // 联动高亮：点接口 → postMessage 让页面高亮对应 data-rpc 区域（再点同一条 = 清除）
+  var currentOp = null;
+  function toggleHighlight(op) {
+    if (!op) return;
+    if (currentOp === op) { clearHighlight(); return; }
+    currentOp = op;
+    frame.contentWindow.postMessage({ source: 'demo-review', cmd: 'highlight', op: op }, '*');
+  }
+  function clearHighlight() {
+    currentOp = null;
+    try { frame.contentWindow.postMessage({ source: 'demo-review', cmd: 'clear-highlight' }, '*'); } catch (e) {}
+    $('#hlInfo').textContent = '';
+  }
+  $('#clearHl').addEventListener('click', clearHighlight);
+
+  // 点击标题展开/折叠 + 联动高亮（勾选开启时）
   trace.addEventListener('click', function (ev) {
     var hd = ev.target.closest ? ev.target.closest('.hd') : null;
     if (!hd) return;
     hd.parentElement.classList.toggle('open');
+    if ($('#linkhigh').checked) toggleHighlight(hd.parentElement.dataset.op);
   });
 
   // 过滤

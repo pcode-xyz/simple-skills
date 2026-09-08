@@ -32,6 +32,17 @@
 - 对每个改线页面做静态自检并记录 `pageOpenIssues`（如：某个数据访问没找到 RPC 映射、脚本顺序错、漏了某 const 转缓存）。
 - 确认 app-mock.js 无遗留的「原 demo 直读存储」路径（grep 复核存储 helper 是否已全走缓存/api）。
 
+### 4. 打 data-rpc 出处标记（联动高亮用）
+
+demo-review 看板支持「点击右侧接口 → 左侧页面对应区域高亮」：靠页面上 `data-rpc="<service.op>"`（空格分隔多值）出处标记命中，spy 注入 `.rpc-hot` 变色。对每个改线页面按对照存档给内容区打标记：
+
+- 依据对照存档「位置/元素 + 契约 RPC」列作线索，给**渲染契约 RPC 数据的内容区**打标记：
+  - 静态容器：直接在页面 HTML 标签写 `data-rpc="<service.op>"`（如 `<div class="greeting" data-rpc="home.GetHome">`）；
+  - JS 动态渲染的容器：写进 app-mock.js 渲染模板的根容器（如 `<div class="search-body" data-rpc="card.BatchGetCard concept.GetConceptRead ...">`）。
+- 一个区域由多个 RPC 喂 → 空格分隔多值（如 `data-rpc="deepthink.ListTodo deepthink.GetReviewItem"`）。
+- `pure_client` 区（纯 UI / 导航 / 工具栏 / 输入框）不打。
+- op 必须与契约真实 RPC 一致——看板 trace 条目 `dataset.op = service + '.' + op` 即命中值，拼错则高亮永远 0 命中。
+
 ## 返回（StructuredOutput）
 
 - `apiMockPath` / `appMockPath`：写入路径
