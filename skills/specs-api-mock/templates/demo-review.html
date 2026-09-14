@@ -1,7 +1,8 @@
 <!doctype html>
 <!-- demo-review.html — demo-mock 接口实时 Review 面板
-     左侧 iframe 嵌入 demo-mock 业务页（数据全部经 api-mock.js），
-     右侧实时显示该页发送/收到的每个 RPC 请求与响应（以及流式事件）。
+     三列：左 = 原版 demo 参考（../demo/ 同名页），中 = demo-mock 业务页（数据全部经 api-mock.js），
+     右 = 实时请求列表（每个 RPC 请求/响应/流式事件 + proto 格式校验）。
+     点击右列条目 → 中列联动高亮 data-rpc 区域 + 对照 proto 定义做格式校验。
      原理：页面里的 api-spy.js 把 window.api.* 包装成双向上报，postMessage 到这里。
      file:// 直开可用，无服务器无网络。 -->
 <html lang="zh-CN">
@@ -42,10 +43,11 @@
   #stats { margin-left: auto; font-size: 12px; color: #9aa0a8; white-space: nowrap; }
   #stats b { color: #e8eaf0; }
 
-  /* ---- 舞台：左 iframe 右 流量 ---- */
+  /* ---- 舞台：左原版 中 demo-mock 右流量 ---- */
   #stage { position: fixed; top: 46px; left: 0; right: 0; bottom: 0; display: flex; }
-  #frameWrap { flex: 1 1 62%; min-width: 0; display: flex; flex-direction: column; background: #fff; }
-  #frameHint {
+  #origWrap { flex: 1 1 24%; min-width: 0; display: flex; flex-direction: column; background: #fff; border-right: 1px solid #2c2e33; }
+  #frameWrap { flex: 1 1 46%; min-width: 0; display: flex; flex-direction: column; background: #fff; }
+  #origHint, #frameHint {
     padding: 3px 10px; font-size: 12px; color: #7a7f87; background: #f4f5f7;
     border-bottom: 1px solid #e2e3e6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
@@ -63,7 +65,7 @@
 
   /* ---- 右侧流量面板 ---- */
   #trace {
-    flex: 1 1 38%; min-width: 360px; max-width: 720px;
+    flex: 1 1 30%; min-width: 340px; max-width: 640px;
     border-left: 1px solid #2c2e33; background: #16181b;
     overflow-y: auto; overflow-x: hidden;
     font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -113,9 +115,59 @@
   .push .kind.error    { color: #ff6b6b; }
   .push .txt { color: #b8bcc4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
 
+  /* ---- proto 格式校验（展开条目内追加） ---- */
+  .proto-check { margin-top: 8px; border-top: 1px dashed #2c2e33; padding-top: 6px; }
+  .pc-summary { display: flex; align-items: center; gap: 8px; font-size: 11px; flex-wrap: wrap; }
+  .pc-op { color: #b18cff; font-weight: 600; }
+  .pc-side { color: #8a8f98; }
+  .pc-neutral { color: #6b7078; }
+  .pc-detail { margin-top: 6px; font-size: 11px; }
+  .pc-detail summary { color: #8a8f98; cursor: pointer; user-select: none; }
+  .pc-row { display: flex; gap: 8px; padding: 1px 0; color: #9aa0a8; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .pc-row.pc-err  { color: #ff9a9a; }
+  .pc-row.pc-info { color: #ffd479; }
+  .pc-row.pc-ok   { color: #7ce38b; }
+  .pc-mark { width: 12px; flex: none; }
+  .pc-path { color: inherit; white-space: nowrap; }
+  .pc-msg  { color: inherit; }
+  .pc-push { display: flex; gap: 8px; margin-top: 4px; color: #8a8f98; font-size: 11px; }
+  .pc-idx  { color: #5a5f67; }
+
   .foot { padding: 14px; text-align: center; color: #5a5f67; font-size: 11px; }
 
+  /* ---- 符合预期标记 ---- */
+  .entry .ck { width: 13px; height: 13px; flex: none; margin: 0; accent-color: #4cd964; cursor: pointer; }
+  .entry.approved { box-shadow: inset 3px 0 0 #4cd964; }
+  .entry.approved .op { color: #7ce38b; }
+
+  /* ---- 通过看板（按 proto 文件聚合） ---- */
+  #board { position: fixed; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center; background: rgba(10, 11, 13, .55); }
+  #board.open { display: flex; }
+  #board .panel {
+    width: min(680px, calc(100vw - 48px)); max-height: calc(100vh - 64px);
+    background: #17191d; border: 1px solid #2c2e33; border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5); display: flex; flex-direction: column; overflow: hidden;
+  }
+  #board .bhd { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #2c2e33; }
+  #board .bhd .bt { font-weight: 600; color: #e8eaf0; }
+  #board .bhd button { background: #25272c; border: 1px solid #3a3d44; border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+  #board .bhd button:hover { background: #2f3238; }
+  #board .bhd .bclear { margin-left: auto; }
+  #boardBody { overflow-y: auto; padding: 10px 14px 16px; }
+  #boardBody .bsum { color: #9aa0a8; font-size: 12px; padding: 2px 2px 10px; border-bottom: 1px dashed #26282d; margin-bottom: 6px; }
+  #boardBody .bsum b { color: #7ce38b; }
+  .bfile { margin-top: 8px; }
+  .bfile-hd { display: flex; align-items: center; gap: 8px; padding: 4px 8px; color: #e8eaf0; font-weight: 600; font-size: 12px; background: #1e2024; border: 1px solid #2c2e33; border-radius: 6px 6px 0 0; }
+  .bfile-n { margin-left: auto; font-weight: 400; color: #8a8f98; font-size: 11px; }
+  .bfile-n b { color: #7ce38b; }
+  .brow { display: flex; align-items: center; gap: 8px; padding: 3px 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: #6b7078; border: 1px solid #2c2e33; border-top: 0; }
+  .brow:last-child { border-radius: 0 0 6px 6px; }
+  .brow .bmark { width: 14px; flex: none; text-align: center; color: #4cd964; }
+  .brow.on { color: #cdd0d6; }
+  .brow.on .bop { color: #e8eaf0; }
+
   @media (max-width: 900px) {
+    #origWrap { display: none; }
     #stage { flex-direction: column; }
     #frameWrap { flex: 1 1 45%; }
     #trace { flex: 1 1 55%; max-width: none; border-left: 0; border-top: 1px solid #2c2e33; }
@@ -131,6 +183,7 @@
   <select id="deviceSel" title="预览设备尺寸"></select>
   <button id="reload" title="重新打开当前页">↻ 重新打开</button>
   <button id="clear">清空日志</button>
+  <button id="boardBtn" title="查看已通过接口看板（按 proto 文件聚合）">通过看板</button>
   <label title="新事件自动滚到底部"><input type="checkbox" id="autoscroll" checked> 自动滚动</label>
   <label title="点击接口时高亮页面对应区域"><input type="checkbox" id="linkhigh" checked> 联动高亮</label>
   <button id="clearHl" title="清除页面高亮">清除高亮</button>
@@ -141,20 +194,36 @@
 </div>
 
 <div id="stage">
+  <div id="origWrap">
+    <div id="origHint">原版参考 · docs/product/demo</div>
+    <iframe id="origFrame" title="原版 demo 参考"></iframe>
+  </div>
   <div id="frameWrap">
-    <div id="frameHint">提示：在左侧页面上点击按钮 / 发送消息 / 保存设置，右侧会实时显示对应的 RPC 请求与响应。</div>
+    <div id="frameHint">提示：在中列页面上点击按钮 / 发送消息 / 保存设置，右侧会实时显示对应的 RPC 请求与响应（含 proto 格式校验）。</div>
     <iframe id="frame" title="demo-mock 页面"></iframe>
   </div>
   <div id="trace"></div>
 </div>
 
+<div id="board">
+  <div class="panel">
+    <div class="bhd">
+      <span class="bt">接口 Review 看板 · 按 proto 文件聚合</span>
+      <button class="bclear" id="boardClear" title="清空全部「符合预期」标记">清空全部通过</button>
+      <button id="boardClose" title="关闭">✕ 关闭</button>
+    </div>
+    <div id="boardBody"></div>
+  </div>
+</div>
+
+<script src="proto-index.js"></script>
 <script>
 (function () {
   'use strict';
   var PAGES = __PAGES_JSON__;   // 生成时替换为业务页名 JSON 数组（无则留空数组）
 
   var $ = function (s) { return document.querySelector(s); };
-  var frame = $('#frame'), trace = $('#trace'), pageSel = $('#pageSel'), filter = $('#filter');
+  var frame = $('#frame'), origFrame = $('#origFrame'), trace = $('#trace'), pageSel = $('#pageSel'), filter = $('#filter');
 
   // PAGES -> option
   PAGES.forEach(function (p) {
@@ -164,7 +233,7 @@
   });
 
   // 设备尺寸（0 = 自适应）。demo 为 520px 手机壳设计，切尺寸即真实手机预览
-  var HINT_DEFAULT = '提示：在左侧页面上点击按钮 / 发送消息 / 保存设置，右侧会实时显示对应的 RPC 请求与响应。';
+  var HINT_DEFAULT = '提示：在中列页面上点击按钮 / 发送消息 / 保存设置，右侧会实时显示对应的 RPC 请求与响应。';
   var DEVICES = [
     { label: '自适应', w: 0, h: 0 },
     { label: 'iPhone 14 Pro · 393×852', w: 393, h: 852 },
@@ -203,6 +272,24 @@
   var lastPhase = null;
   var firstT = null, lastT = null;
   var ready = false;
+
+  /* ---------- 符合预期标记（按接口 op 聚合，localStorage 持久化） ---------- */
+  var LS_KEY = 'demo-review-approved-v1';
+  var approved = (function () {
+    var s = new Set();
+    try { JSON.parse(localStorage.getItem(LS_KEY) || '[]').forEach(function (x) { if (typeof x === 'string') s.add(x); }); } catch (e) {}
+    return s;
+  })();
+  function saveApproved() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(Array.from(approved))); } catch (e) {}
+  }
+  function applyApproved(entry, op) {
+    var ck = entry.querySelector('.ck');
+    if (!ck) return;
+    var on = approved.has(op);
+    ck.checked = on;
+    entry.classList.toggle('approved', on);
+  }
 
   /* ---------- 流量面板渲染 ---------- */
 
@@ -252,12 +339,182 @@
     return p;
   }
 
+  /* ---------- proto 格式校验（对照 docs/specs/grpc → proto-index.js） ---------- */
+  var PI = window.PROTO_INDEX || null;
+  var PI_PRIM = { uint32: 1, int32: 1, string: 1, bool: 1, 'google.protobuf.Timestamp': 1 };
+  function piMsg(name) { return PI ? (PI.messages[name] || null) : null; }
+  function piServiceOp(service, op) {
+    return PI && PI.services[service] ? (PI.services[service][op] || null) : null;
+  }
+  function piCheckMessage(fq, obj, prefix, out, depth) {
+    var msg = piMsg(fq);
+    if (!msg || depth > 8) return;
+    Object.keys(obj).forEach(function (k) {
+      if (k === '__unserializable__') return;
+      if (!msg.fields.some(function (f) { return f.name === k; })) {
+        out.push({ path: prefix + k, ok: false, level: 'err', type: 'unknown', msg: '未知字段 ' + k + '（proto 未定义）' });
+      }
+    });
+    msg.fields.forEach(function (f) {
+      var p = prefix + f.name;
+      if (!Object.prototype.hasOwnProperty.call(obj, f.name)) {
+        out.push({ path: p, ok: true, level: 'miss', type: 'missing', msg: '未提供字段 ' + f.name + '（proto3 可缺省）' });
+        return;
+      }
+      var v = obj[f.name];
+      if (f.repeated) {
+        if (!Array.isArray(v)) {
+          out.push({ path: p, ok: false, level: 'err', type: 'type', msg: f.name + ' 应为数组（repeated ' + f.type + '），实际 ' + typeof v });
+          return;
+        }
+        v.forEach(function (elv, i) { piCheckValue(f.type, msg.package, elv, p + '[' + i + '].', out, depth + 1); });
+        return;
+      }
+      piCheckValue(f.type, msg.package, v, p + '.', out, depth + 1);
+    });
+  }
+  function piCheckValue(rawType, pkg, value, p, out, depth) {
+    var path = p.replace(/\.$/, '');
+    var t = rawType;
+    if (PI_PRIM[t]) {
+      if (t === 'uint32' || t === 'int32') {
+        if (typeof value !== 'number') out.push({ path: path, ok: false, level: 'err', type: 'type', msg: '应为 ' + t + '（number），实际 ' + typeof value });
+        else if (t === 'uint32' && value < 0) out.push({ path: path, ok: false, level: 'err', type: 'type', msg: 'uint32 不能为负' });
+        else if (!Number.isInteger(value)) out.push({ path: path, ok: false, level: 'err', type: 'type', msg: t + ' 应为整数' });
+        else out.push({ path: path, ok: true, level: 'ok', type: 'type', msg: t });
+      } else if (t === 'string') {
+        if (typeof value !== 'string') out.push({ path: path, ok: false, level: 'err', type: 'type', msg: '应为 string，实际 ' + typeof value });
+        else out.push({ path: path, ok: true, level: 'ok', type: 'type', msg: 'string' });
+      } else if (t === 'bool') {
+        if (typeof value !== 'boolean') out.push({ path: path, ok: false, level: 'err', type: 'type', msg: '应为 bool，实际 ' + typeof value });
+        else out.push({ path: path, ok: true, level: 'ok', type: 'type', msg: 'bool' });
+      } else { /* Timestamp */
+        if (typeof value !== 'string') out.push({ path: path, ok: false, level: 'err', type: 'type', msg: 'Timestamp 应为 ISO 字符串，实际 ' + typeof value });
+        else if (!/^\d{4}-\d{2}-\d{2}[T ]/.test(value)) out.push({ path: path, ok: false, level: 'info', type: 'type', msg: '非 ISO 时间格式：' + value });
+        else out.push({ path: path, ok: true, level: 'ok', type: 'type', msg: 'Timestamp' });
+      }
+      return;
+    }
+    var fq = t.indexOf('.') >= 0 ? t : (pkg + '.' + t);
+    var msg = piMsg(fq);
+    if (!msg) { out.push({ path: path, ok: false, level: 'info', type: 'ref', msg: '无消息定义 ' + fq }); return; }
+    if (value === null || value === undefined) { out.push({ path: path, ok: true, level: 'ok', type: 'ref', msg: fq + '（null 缺省）' }); return; }
+    if (typeof value !== 'object' || Array.isArray(value)) { out.push({ path: path, ok: false, level: 'err', type: 'type', msg: '应为对象 ' + fq + (Array.isArray(value) ? '，实际数组' : '') }); return; }
+    piCheckMessage(fq, value, p, out, depth);
+  }
+  function piValidateMessage(side, fq, obj, suppressMissing) {
+    var out = [];
+    piCheckMessage(fq, obj || {}, '', out, 0);
+    var checks = [];
+    out.forEach(function (c) {
+      if (c.level === 'miss' && suppressMissing) return;
+      if (c.level === 'miss') c.level = 'info';
+      c.side = side;
+      checks.push(c);
+    });
+    var errs = 0, infos = 0;
+    checks.forEach(function (c) { if (c.level === 'err') errs++; else if (c.level === 'info') infos++; });
+    return { checks: checks, errs: errs, infos: infos, ok: checks.length - errs - infos, total: checks.length };
+  }
+  function piReq(service, op, obj) {
+    if (!PI) return { ready: false };
+    var so = piServiceOp(service, op);
+    if (!so) return { notDefined: true };
+    return piValidateMessage('req', so.requestMsg, obj, false);
+  }
+  function piRes(service, op, obj) {
+    if (!PI) return { ready: false };
+    var so = piServiceOp(service, op);
+    if (!so) return { notDefined: true };
+    if (so.stream) return { stream: true };
+    var isErr = obj && typeof obj.code === 'number' && obj.code !== 0;
+    return piValidateMessage('res', so.responseMsg, obj, isErr);
+  }
+  function piPush(service, op, evt) {
+    if (!PI) return { ready: false };
+    var so = piServiceOp(service, op);
+    if (!so || !so.stream) return { notDefined: true };
+    var evMsg = piMsg(so.responseMsg);
+    if (!evMsg) return { notDefined: true };
+    var keys = Object.keys(evt || {}).filter(function (k) { return k !== '__unserializable__'; });
+    if (keys.length !== 1) return { notDefined: true };
+    var k = keys[0];
+    var f = evMsg.fields.filter(function (x) { return x.name === k; })[0];
+    if (!f) return { checks: [{ side: 'evt', path: k, ok: false, level: 'err', type: 'unknown', msg: '未知事件类型 ' + k }], errs: 1, infos: 0, ok: 0, total: 1 };
+    var out = [];
+    piCheckValue(f.type, evMsg.package, evt[k], k + '.', out, 1);
+    out.forEach(function (c) { c.side = 'evt'; });
+    var errs = 0, infos = 0;
+    out.forEach(function (c) { if (c.level === 'err') errs++; else if (c.level === 'info') infos++; });
+    return { checks: out, errs: errs, infos: infos, ok: out.length - errs - infos, total: out.length };
+  }
+  function pcStat(label, r) {
+    if (!r) return label + ' —';
+    if (r.notDefined) return label + ' 无定义';
+    if (r.ready === false) return label + ' —';
+    if (r.stream) return label + ' 流';
+    var s = label + ' ✓' + r.ok + '/' + r.total;
+    if (r.errs) s += ' · ✗' + r.errs;
+    if (r.infos) s += ' · ⓘ' + r.infos;
+    return s;
+  }
+  function pcRow(c) {
+    var r = el('div', 'pc-row' + (c.level === 'err' ? ' pc-err' : (c.level === 'info' ? ' pc-info' : ' pc-ok')));
+    r.appendChild(el('span', 'pc-mark', c.level === 'err' ? '✗' : (c.level === 'info' ? 'ⓘ' : '✓')));
+    r.appendChild(el('span', 'pc-path', c.side + ' ' + c.path));
+    r.appendChild(el('span', 'pc-msg', c.msg));
+    return r;
+  }
+  function renderProtoCheck(entry) {
+    if (entry._pcBlock) { entry._pcBlock.remove(); entry._pcBlock = null; }
+    if (!entry.classList.contains('open')) return;
+    var bd = entry.querySelector('.bd');
+    if (!bd) return;
+    var service = entry._service, op = entry._op;
+    var block = el('div', 'proto-check');
+    if (!PI) {
+      block.appendChild(el('div', 'pc-summary', '未生成 proto-index.js（运行 node gen-proto-index.cjs）'));
+      bd.appendChild(block); entry._pcBlock = block; return;
+    }
+    var rq = piReq(service, op, entry._sub != null ? entry._sub : entry._req);
+    var rs = entry._resp ? piRes(service, op, entry._resp) : null;
+    var summary = el('div', 'pc-summary');
+    if (rq.notDefined) {
+      summary.appendChild(el('span', 'pc-neutral', service + '.' + op + ' · 无 proto 定义'));
+      block.appendChild(summary);
+      bd.appendChild(block); entry._pcBlock = block; return;
+    }
+    summary.appendChild(el('span', 'pc-op', service + '.' + op));
+    summary.appendChild(el('span', 'pc-side', pcStat('请求', rq)));
+    if (rs) summary.appendChild(el('span', 'pc-side', pcStat('响应', rs)));
+    block.appendChild(summary);
+    var det = el('details', 'pc-detail');
+    det.appendChild(el('summary', '', '校验明细'));
+    (rq.checks || []).forEach(function (c) { det.appendChild(pcRow(c)); });
+    if (rs && rs.checks) rs.checks.forEach(function (c) { det.appendChild(pcRow(c)); });
+    if (entry._pushes) entry._pushes.forEach(function (evt, i) {
+      var pr = piPush(service, op, evt);
+      var l = el('div', 'pc-push');
+      l.appendChild(el('span', 'pc-idx', '#' + i));
+      l.appendChild(el('span', 'pc-psum', pr.notDefined ? '事件类型未定义' : pcStat('事件', pr)));
+      det.appendChild(l);
+      if (pr.checks) pr.checks.forEach(function (c) { det.appendChild(pcRow(c)); });
+    });
+    if (det.childNodes.length > 1) block.appendChild(det);
+    bd.appendChild(block);
+    entry._pcBlock = block;
+  }
+
   function addReqEntry(e, page) {
     ensureGroup(e.phase);
     var entry = el('div', 'entry');
     entry.dataset.op = e.service + '.' + e.op;
     entry.dataset.phase = e.phase;
+    entry._service = e.service; entry._op = e.op; entry._req = e.args;
     var hd = el('div', 'hd');
+    var ck = document.createElement('input');
+    ck.type = 'checkbox'; ck.className = 'ck'; ck.title = '标记该接口符合预期';
+    hd.appendChild(ck);
     hd.appendChild(el('span', 'dir up', '↑'));
     hd.appendChild(el('span', 'phase ' + e.phase, e.phase === 'interact' ? '交互' : '打开'));
     hd.appendChild(el('span', 'op', e.service + '.' + e.op));
@@ -270,6 +527,7 @@
     var bd = el('div', 'bd');
     bd.appendChild(part('请求（发送）', pretty(e.args), false));
     entry.appendChild(hd); entry.appendChild(bd);
+    applyApproved(entry, e.service + '.' + e.op);
     trace.appendChild(entry);
     scrollBottom();
     return entry;
@@ -284,6 +542,7 @@
       entry.querySelector('.dir').className = 'dir down';
       entry.querySelector('.dir').textContent = '↓';
       stats.res++;
+      entry._resp = e.resp;
     } else {
       meta.textContent = fmtT(e.t) + ' · ✗ ' + (e.error || 'error');
       bd.appendChild(part('错误', e.error, true));
@@ -292,6 +551,7 @@
       stats.err++;
     }
     renderStats();
+    renderProtoCheck(entry);
     scrollBottom();
   }
 
@@ -311,7 +571,11 @@
     var entry = el('div', 'entry sub');
     entry.dataset.op = e.service + '.' + e.op;
     entry.dataset.phase = e.phase;
+    entry._service = e.service; entry._op = e.op; entry._sub = e.args; entry._pushes = [];
     var hd = el('div', 'hd');
+    var ck = document.createElement('input');
+    ck.type = 'checkbox'; ck.className = 'ck'; ck.title = '标记该接口符合预期';
+    hd.appendChild(ck);
     hd.appendChild(el('span', 'dir sub', '⇄'));
     hd.appendChild(el('span', 'phase ' + e.phase, e.phase === 'interact' ? '交互' : '打开'));
     hd.appendChild(el('span', 'op', e.service + '.' + e.op));
@@ -326,6 +590,7 @@
     var stream = el('div', 'stream');
     bd.appendChild(stream);
     entry.appendChild(hd); entry.appendChild(bd);
+    applyApproved(entry, e.service + '.' + e.op);
     trace.appendChild(entry);
     scrollBottom();
     return entry;
@@ -334,6 +599,7 @@
   function addPushLine(subEntry, e) {
     var stream = subEntry.querySelector('.stream');
     if (!stream) return;
+    subEntry._pushes.push(e.event);
     var kind, txt;
     try { var r = summarizeEvent(e.event); kind = r[0]; txt = r[1]; } catch (x) { kind = '?'; txt = ''; }
     var line = el('div', 'push');
@@ -345,6 +611,7 @@
     var meta = subEntry.querySelector('[data-role="meta"]');
     meta.textContent = fmtT(e.t) + ' · ' + (e.idx + 1) + ' 事件';
     renderStats();
+    renderProtoCheck(subEntry);
     scrollBottom();
   }
 
@@ -424,12 +691,59 @@
     clearHighlight();
     ready = false;
     setStatus(false, '加载 ' + name + '.html …');
-    frame.src = name + '.html';
+    origFrame.src = '../demo/' + name + '.html';   // 左列：原版参考（同页名）
+    frame.src = name + '.html';                    // 中列：demo-mock（喂流量）
   }
 
   pageSel.addEventListener('change', function () { loadPage(pageSel.value); });
   $('#reload').addEventListener('click', function () { loadPage(pageSel.value); });
   $('#clear').addEventListener('click', clearLog);
+
+  /* ---------- 通过看板（按 proto 文件聚合已通过接口） ---------- */
+  function renderBoard() {
+    var body = $('#boardBody');
+    body.innerHTML = '';
+    if (!PI) { body.appendChild(el('div', '', '未生成 proto-index.js（运行 node gen-proto-index.cjs）')); return; }
+    var files = Object.keys(PI.services).sort();
+    var totalOps = 0, totalOk = 0;
+    files.forEach(function (f) {
+      var ops = Object.keys(PI.services[f]).sort();
+      var ok = ops.filter(function (op) { return approved.has(f + '.' + op); }).length;
+      totalOps += ops.length; totalOk += ok;
+      var g = el('div', 'bfile');
+      var hd = el('div', 'bfile-hd');
+      hd.appendChild(el('span', 'bfile-name', f + '.proto'));
+      var n = el('span', 'bfile-n');
+      n.innerHTML = '已通过 <b>' + ok + '</b> / ' + ops.length;
+      hd.appendChild(n);
+      g.appendChild(hd);
+      ops.forEach(function (op) {
+        var on = approved.has(f + '.' + op);
+        var row = el('div', 'brow' + (on ? ' on' : ''));
+        row.appendChild(el('span', 'bmark', on ? '✓' : ''));
+        row.appendChild(el('span', 'bop', op));
+        g.appendChild(row);
+      });
+      body.appendChild(g);
+    });
+    var bsum = el('div', 'bsum');
+    bsum.innerHTML = '已通过 <b>' + totalOk + '</b> / ' + totalOps + ' 个接口 · 覆盖 ' + files.length + ' 个 proto 文件';
+    body.insertBefore(bsum, body.firstChild);
+  }
+  $('#boardBtn').addEventListener('click', function () {
+    var b = $('#board');
+    b.classList.toggle('open');
+    if (b.classList.contains('open')) renderBoard();
+  });
+  $('#boardClose').addEventListener('click', function () { $('#board').classList.remove('open'); });
+  $('#board').addEventListener('click', function (ev) { if (ev.target === this) this.classList.remove('open'); });
+  $('#boardClear').addEventListener('click', function () {
+    if (!confirm('清空全部「符合预期」标记？')) return;
+    approved.clear();
+    saveApproved();
+    trace.querySelectorAll('.entry').forEach(function (en) { applyApproved(en, en.dataset.op); });
+    renderBoard();
+  });
 
   // 联动高亮：点接口 → postMessage 让页面高亮对应 data-rpc 区域（再点同一条 = 清除）
   var currentOp = null;
@@ -446,11 +760,23 @@
   }
   $('#clearHl').addEventListener('click', clearHighlight);
 
-  // 点击标题展开/折叠 + 联动高亮（勾选开启时）
+  // 点击标题展开/折叠 + 联动高亮（勾选开启时）；点复选框 = 标记/取消「符合预期」
   trace.addEventListener('click', function (ev) {
+    var ck = ev.target.closest ? ev.target.closest('.ck') : null;
+    if (ck) {
+      var op = ck.closest('.entry').dataset.op;
+      if (ck.checked) approved.add(op); else approved.delete(op);
+      saveApproved();
+      trace.querySelectorAll('.entry').forEach(function (en) {
+        if (en.dataset.op === op) applyApproved(en, op);
+      });
+      if ($('#board').classList.contains('open')) renderBoard();
+      return;
+    }
     var hd = ev.target.closest ? ev.target.closest('.hd') : null;
     if (!hd) return;
     hd.parentElement.classList.toggle('open');
+    if (hd.parentElement.classList.contains('open')) renderProtoCheck(hd.parentElement);
     if ($('#linkhigh').checked) toggleHighlight(hd.parentElement.dataset.op);
   });
 
