@@ -114,6 +114,16 @@
   .push .kind.card     { color: #4a9eff; }
   .push .kind.error    { color: #ff6b6b; }
   .push .txt { color: #b8bcc4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+  /* 订阅推送项可展开：点行查看该事件的完整结构（oneof JSON） */
+  .push.expandable { cursor: pointer; }
+  .push .tw { margin-left: auto; color: #5a5f67; font-size: 10px; flex: none; transition: transform .12s; }
+  .push.expandable.open .tw { transform: rotate(90deg); }
+  .push-detail { display: none; padding: 4px 0 8px 24px; }
+  .push-detail pre {
+    margin: 0; background: #191b1f; border: 1px solid #26282d; border-radius: 6px;
+    padding: 8px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px; line-height: 1.55; color: #b8bcc4; white-space: pre-wrap; word-break: break-word;
+  }
 
   /* ---- proto 格式校验（展开条目内追加） ---- */
   .proto-check { margin-top: 8px; border-top: 1px dashed #2c2e33; padding-top: 6px; }
@@ -602,11 +612,21 @@
     subEntry._pushes.push(e.event);
     var kind, txt;
     try { var r = summarizeEvent(e.event); kind = r[0]; txt = r[1]; } catch (x) { kind = '?'; txt = ''; }
-    var line = el('div', 'push');
+    var line = el('div', 'push expandable');
     line.appendChild(el('span', 'idx', '#' + e.idx));
     line.appendChild(el('span', 'kind ' + kind, kind));
     line.appendChild(el('span', 'txt', txt));
+    line.appendChild(el('span', 'tw', '▸'));
+    // 点击展开：查看该事件的完整结构（oneof 原样 JSON），含 ChatMessage 全字段
+    var detail = el('div', 'push-detail');
+    detail.appendChild(el('pre', '', pretty(e.event)));
+    line.addEventListener('click', function (ev) {
+      var on = line.classList.toggle('open');
+      detail.style.display = on ? 'block' : 'none';
+      ev.stopPropagation();
+    });
     stream.appendChild(line);
+    stream.appendChild(detail);
     stats.push++;
     var meta = subEntry.querySelector('[data-role="meta"]');
     meta.textContent = fmtT(e.t) + ' · ' + (e.idx + 1) + ' 事件';

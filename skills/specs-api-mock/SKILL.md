@@ -84,6 +84,7 @@ disable-model-invocation: true
 - **通过看板**：工具栏「通过看板」按钮弹出面板，按 **API 文件名（proto 文件）** 分组列出全部接口，已通过打绿色 ✓、未通过置灰，带每文件 `已通过 x / n` 与全局 `已通过 x / y · 覆盖 n 个 proto 文件` 汇总；「清空全部通过」一键重置（带确认）。
 - **联动高亮**：点右列任一接口条目 → 中列页面上该接口喂出来的内容区（带 `data-rpc` 标记）整体描边变色并滚到视野，再点同一条取消；「清除高亮」按钮一键还原。区域级命中，靠接线阶段打的 `data-rpc="<service.op>"` 出处标记（页面 HTML 静态容器 / app-mock.js 动态模板根），未标记的纯 UI 区不打。
 - **proto 格式校验**（gRPC 分支）：点右列条目展开 → 除中列高亮外，条目内追加 `.proto-check` 块，对照 `proto-index.js`（Step 4 由 `gen-proto-index.cjs` 从 gRPC proto 生成）校验请求/响应/流式事件——未知字段 ✗ / 类型 ✗ / repeated 逐元素 / 嵌套消息递归 / null 缺省 ✓ / 错误响应抑制缺失提示 / 流式 oneof 事件逐条校验。接口定义变更后重跑 `node mockDir/gen-proto-index.cjs <protocolDir> mockDir/proto-index.js` 即可刷新索引。
+- **订阅流单条展开**：右列订阅（`⇄` 流式）条目内的每条推送事件（`thinking` / `message` / `card` / `error`）可点击展开/收起，查看该事件的**完整 oneof 原样 JSON**（如 ChatMessage 全字段 `id / msg_type / sender_user_id / text / extra_json / created_at`），不受行内摘要 60 字截断限制；行尾 `▸` 指示，点行切换。
 - **看板主题 light/dark**：跟随浏览器 `prefers-color-scheme`，在 DevTools `Cmd+Shift+P → Emulate CSS prefers-color-scheme` 切换（页面内按钮无法驱动浏览器模拟）。
 - **缺口工作清单驱动后续接口补充**：对照/接线产出的 gap（契约缺 RPC/字段）→ 按清单运行 `/simple:specs-api` 增量补/改接口，改完重跑本 skill 复核。
 - 接真实后端时：把 `api-mock.js` 的实现换成 fetch/gRPC 客户端即可——mock 层与页面接线解耦，页面不用再改。
