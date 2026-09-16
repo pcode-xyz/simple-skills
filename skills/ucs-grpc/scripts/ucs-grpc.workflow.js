@@ -147,18 +147,21 @@ const results = await pipeline(
   },
   (gen, module) => {
     if (!gen) return null
-    if (skipReview(module)) return { skipped: true }
+    // 审查被跳过：返回独立哨兵（gen_only），避免与修正结果的 skipped 数组冲突
+    if (skipReview(module)) return { gen_only: true }
     return agent(reviewPrompt(module), { label: `审查:${module}`, phase: '审查', schema: REVIEW_RESULT })
   },
   (review, module) => {
-    if (!review || review.skipped) return null
+    // review 为 null => 生成被跳过；review 带 gen_only 哨兵 => 审查被跳过（修正阶段也跳过）
+    if (!review) return null
+    if (review.gen_only) return { gen_only: true }
     return agent(fixPrompt(module), { label: `修正:${module}`, phase: '修正', schema: FIX_RESULT })
   }
 )
 
 const statusOf = (r) => {
   if (!r) return 'skipped'
-  if (r.skipped) return 'gen_only'
+  if (r.gen_only) return 'gen_only'
   return 'fixed'
 }
 

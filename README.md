@@ -39,7 +39,7 @@ claude plugin install simple@simple
 
 | 命令 | 说明 | 状态 |
 | --- | --- | --- |
-| `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） | |
+| `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） | ✅ |
 | `/simple:specs-design` | 设计元素提取：按 design.md 规范从 demo 提取设计系统（色板/字体/字号/间距/圆角/阴影/组件）→ docs/specs/design/DESIGN.md | ✅ |
 | `/simple:specs-components` | 组件提取：demo 页面可复用视觉单元归类为规范组件 → docs/specs/design/COMPONENTS.md + component-map-rule.md（跨端组件映射表） | |
 | `/simple:product-business` | 基于 sense.md + demo 原型稿，用四色建模法梳理业务流程（business-flow.md） | ✅ |
@@ -51,9 +51,9 @@ claude plugin install simple@simple
 | --- | --- | --- |
 | `/simple:architecture` | 技术选型：选端→选技术栈（带推荐）→后端定架构→构造选型 prompt 输出 tech-stack-rule/draft | ✅ |
 | `/simple:standards-directory` | 目录结构设计：读 architecture 选型→按架构风格选模板（DDD/扁平切片/MVC/OOP）→输出 directory-rule/draft | ✅ |
-| `/simple:standards-http` | HTTP handler 请求流转说明（仅后端）：按架构风格选模板，输出 http-handler-rule/draft | |
-| `/simple:standards-tools` | 工具层设计（通用）：按端+架构风格选模板，输出 tools-rule/draft | |
-| `/simple:standards-task` | 异步任务层选型（仅后端）：候选对比+架构决策 → task-layer-rule/draft | |
+| `/simple:standards-http` | HTTP handler 请求流转说明（仅后端）：按架构风格选模板，输出 http-handler-rule/draft | ✅ |
+| `/simple:standards-tools` | 工具层设计（通用）：按端+架构风格选模板，输出 tools-rule/draft | ✅ |
+| `/simple:standards-task` | 异步任务层选型（仅后端）：候选对比+架构决策 → task-layer-rule/draft | ✅ |
 
 ### 数据 / 接口 / 协议定义
 
@@ -62,17 +62,17 @@ claude plugin install simple@simple
 | `/simple:specs-db` | 数据库设计：选 DB 类型（推荐），MySQL 9 条规范生成 table.sql，其他 DB 适配 | ✅ |
 | `/simple:specs-data` | 数据结构定义：可靠性视角识别显式结构（DB JSON/跨接口共享/载荷/外部契约）→ struct.md | |
 | `/simple:specs-api` | 接口定义：选 HTTP(OpenAPI3.0 → docs/specs/API/) / gRPC(proto3 → docs/specs/grpc/)；HTTP 再选标准 RESTful 或只用 GET/POST；顺序 subagent 逐页生成，按模块合并 | ✅ |
-| `/simple:specs-api-mock` | 接口 Mock 层生成 + demo 接线 + 满足度对照：契约子 agent 按接口定义（gRPC/HTTP）生成 api-mock.js（契约字段、流式订阅、状态化 store，demo 真实数据 1:1 播种）→ 并行页面对照（数据访问 → RPC/字段，covered/未接线/gap/pure_client）→ 单写接线复制页面换脚本全走 api-mock + 接口格式校验循环 → 汇总写 docs/specs/review/mock-compare.md 人话决策单（含跨接口总览，demo-mock/ file:// 直开）。取代已退役的 specs-api-review | |
+| `/simple:specs-api-mock` | 接口 Mock 层生成 + demo 接线 + 满足度对照：契约子 agent 按接口定义（gRPC/HTTP）生成 api-mock.js（契约字段、流式订阅、状态化 store，demo 真实数据 1:1 播种）→ 并行页面对照（数据访问 → RPC/字段，covered/未接线/gap/pure_client）→ 单写接线复制页面换脚本全走 api-mock + 接口格式校验循环 → 汇总写 docs/specs/review/mock-compare.md 人话决策单（含跨接口总览，demo-mock/ file:// 直开）。取代已退役的 specs-api-review | ✅ |
 | `/simple:specs-ws` | WS 协议定义（AsyncAPI 2.6，仅后端）：识别实时通道→顺序 subagent 生成 → docs/specs/ws/ | |
 
 ### 用例规约（UCS）
 
 | 命令 | 说明 | 状态 |
 | --- | --- | --- |
-| `/simple:ucs-api` | 接口用例规约 UCS（仅后端）：顺序 subagent 生成 UCS → API-UCS，再安全审查（6 维度）→ API-UCS-review | ✅ |
-| `/simple:ucs-grpc` | gRPC 接口用例规约 UCS（仅后端）：顺序 subagent 生成 UCS → grpc-UCS，再安全审查（6 维度）→ grpc-UCS-review | |
-| `/simple:ucs-page` | 页面用例规约 Page UCS（仅写页面端）：盘点 demo 页面→逐任务 subagent 生成 → page-UCS | ✅ |
-| `/simple:ucs-task` | 异步任务用例规约 task-UCS（仅后端）：business-flow 梳理 + grilling 逐任务探讨→生成 task-UCS | |
+| `/simple:ucs-api` | 接口用例规约 UCS（仅后端）：三阶段 Workflow pipeline（生成→审查→修正，逐模块并行）生成 UCS → API-UCS，6 维安全审查 → API-UCS-review，修正写回 | ✅ |
+| `/simple:ucs-grpc` | gRPC 接口用例规约 UCS（仅后端）：三阶段 Workflow pipeline（生成→审查→修正，逐模块并行）生成 UCS → grpc-UCS，6 维安全审查 → grpc-UCS-review，修正写回 | ✅ |
+| `/simple:ucs-page` | 页面用例规约 Page UCS（仅写页面端）：确定性切片后 Workflow 逐页并行子 agent 生成页面公约 → docs/specs/page-UCS/<页面>.md | ✅ |
+| `/simple:ucs-task` | 异步任务用例规约 task-UCS（仅后端）：business-flow 梳理 + grilling 逐任务探讨→生成 task-UCS | ✅ |
 | `/simple:ucs-ws` | WS 通道用例规约 WS-UCS（仅后端）：识别通道 + grilling 逐通道探讨→生成 → docs/specs/ws-UCS/ | |
 
 ### 执行落地
@@ -83,8 +83,8 @@ claude plugin install simple@simple
 | `/simple:do-directory` | 目录脚手架搭建（执行型）：读 standards 文档创建目录树 + 基础文件 | ✅ |
 | `/simple:do-db` | DB 初始化（仅后端，执行型）：按 specs/data 建库建表，禁 DROP、只建 spec 内的表 | ✅ |
 | `/simple:do-api` | 接口编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 UCS→编译通过，再顺序 subagent 写测试→更新测试脚本 | |
-| `/simple:do-grpc` | gRPC 服务编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 grpc-UCS→编译通过，再顺序 subagent 写测试→更新测试脚本 | |
-| `/simple:do-task` | 异步任务编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 task-UCS→编译通过，再顺序 subagent 写测试 | |
+| `/simple:do-grpc` | gRPC 服务编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 grpc-UCS→编译通过，再顺序 subagent 写测试→更新测试脚本 | ✅ |
+| `/simple:do-task` | 异步任务编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现所有 task-UCS→编译通过，再顺序 subagent 写测试 | ✅ |
 | `/simple:do-ws` | WS 网关编码+测试（仅后端，执行型）：两阶段——先顺序 subagent 实现 UCS-ws→编译通过，再顺序 subagent 写测试 | |
 | `/simple:do-page` | 页面开发（仅写页面端，执行型）：盘点 page-UCS→顺序 subagent 按公约+demo+API 实现→编译通过 | |
 
@@ -96,6 +96,23 @@ claude plugin install simple@simple
 | `/simple:review` | 代码质量审查（只报告，不改代码）：接口维度（DB 效率/安全/错误处理/契约漂移）+ 全库维度（环调用/孤儿代码/硬编码）→ 分级写 docs/review/issues.md，P0 对话呈现 | |
 | `/simple:review-fix` | 按 issues.md 整改（执行型）：读 issues.md 与用户探讨范围/方案→登记任务（TaskCreate）顺序 subagent 修复→整体构建→归档 docs/review/ 到 archiving/{今日日期} | |
 | `/simple:docker` | Docker 容器化部署：生成 Dockerfile/compose/readme-docker.md，覆盖日志/资源/卷/环境/DB 初始化 | |
+
+## specs-api-mock 详解
+
+接口 Mock 层生成 + demo 接线：把 demo 的真实数据按项目接口定义 **1:1** 做成 JS mock，复制页面到 `demo-mock` 并全部改走 mock 接口层，再逐页对照差异，产出确定性的满足度结论。
+
+**解决什么问题**：前端在真实后端就绪前，需要可运行、数据贴合的 mock 来做接口联调预演；同时要判断「接口定义到底覆盖了多少 demo 数据访问、哪些还没接口」。
+
+**三阶段 Workflow pipeline**：
+
+- **生成**：契约子 agent 读全部接口定义（gRPC proto / HTTP yaml）生成 `api-mock.js`（契约字段命名、流式接口订阅推送、状态化 store + localStorage/window.name 镜像），数据从 demo 实际数据按「demo 字段 → 契约字段」映像播种。
+- **对照**：逐业务页把数据访问映射到契约 RPC/字段，得出 covered / 未接线 / gap / pure_client，写决策单 `docs/specs/review/mock-compare.md`。
+- **接线**：单写复制页面、换脚本全走 api-mock.js；独立校验子 agent 逐调用点核对格式（op 存在性 / 请求·响应字段 ⊆ 契约 / 流式用 `.subscribe`），不一致循环修正到 clean。
+- **接口 Review 看板**：自动生成三列看板（原版 demo 参考 / demo-mock 业务页 / 实时 RPC 流量），点击接口联动高亮对应内容区、对照 proto 做格式校验、打勾「符合预期」+ 按 proto 文件聚合的「通过看板」——模板化，任何项目通用。
+
+产物 `docs/product/demo-mock/` 可 file:// 直开，无服务器、无网络。本 skill 已并入退役的 `specs-api-review`。
+
+![specs-api-mock 接口 Review 看板](article/db6990e97e506b0e45d36a2bba9385e3.png)
 
 ## 工作流：为什么先文档、后编码
 
