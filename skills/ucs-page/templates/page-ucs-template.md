@@ -1,6 +1,6 @@
 # 页面用例规约（Page UCS Template）
 
-> 每个页面一份，按此结构逐节填写。组件名以本页组件切片（`docs/specs/design/.slice/<页面>.md`，自 `COMPONENTS.md` 派生）的规范组件为准；无切片时回退所选组件库（`{组件库}` 占位，如 Element Plus / Ant Design / TDesign / uni-ui 等）。
+> 每个页面一份，按此结构逐节填写。组件名以本页组件切片（`docs/specs/design/.slice/<页面>.md`，自 `COMPONENTS.md` 派生）的规范组件为准；无切片时按 `tech-stack-rule.md` 的 **UI 组件库行**取值填 `{组件库}` 占位（可能是组件库名，也可能是"不引第三方组件库 / core 自建"——不要预设为某个库）。
 
 # {页面名}（{页面文件}）
 

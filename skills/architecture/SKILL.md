@@ -37,6 +37,8 @@ disable-model-invocation: true
 
 **说明**：每个可选项对应一份**自包含的推荐约束块**。用户确认选择后，把该块**整块**注入 Step 4 的 prompt，**严禁混入其他方案的块**（避免跨语言/跨方案串配）。替代方案只写在同选型内部（同语言组件级替代，不会串语言）。运行时 subagent 会核对"当前最流行、与本地环境匹配"，可微调定稿。
 
+**UI 组件库这类需要横向对比的选型**（如 RN 的 UI 库）：给候选前先 WebSearch，核对各候选的 **GitHub star 数与最后更新时间**，把判据随候选一并摆给用户，让"是否还在维护"可见。端自带内置组件体系（Flutter Material / SwiftUI / Compose）时不适用。
+
 ### 前端
 
 - **选 Vue3（推荐）** → 约束块：框架 Vue 3、语言 TypeScript、构建 Vite、路由 Vue Router、状态 Pinia、UI Element Plus（组件式开发）、HTTP axios；SSR/全栈加 Nuxt。替代：React/Svelte。
@@ -51,7 +53,7 @@ disable-model-invocation: true
 ### App
 
 - **选 Flutter（推荐）** → 约束块：UI Flutter（组件式开发）、状态 Riverpod/Provider、路由 go_router、HTTP dio、序列化 json_serializable。替代：React Native。
-- **选 React Native** → 约束块：UI 主流 RN 组件库（组件式开发）、导航 React Navigation、状态 Zustand/Redux Toolkit、数据 TanStack Query、HTTP axios、热更新 CodePush。替代：Flutter。
+- **选 React Native** → 约束块：UI React Native Paper / Tamagui / gluestack-ui，或 **RN core 自建基础组件**（组件式开发；**四者必确认其一，不得留空**）、导航 React Navigation、状态 Zustand/Redux Toolkit、数据 TanStack Query、HTTP axios、热更新 CodePush。替代：Flutter。
 
 ### 桌面端
 

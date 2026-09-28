@@ -1,11 +1,12 @@
 # COMPONENTS.md 示例（booking 场景）
 
-> 供 specs-components 的 subagent 对齐格式。非模板——token 值从 DESIGN.md 引用（此处示例值为占位示意）。
+> 供 specs-components 的 subagent 对齐格式。**格式示意：端与场景均无关，切勿照抄**——端取自本项目 `tech-stack-rule.md`，场景取自本项目 demo，token 值从 DESIGN.md 引用（此处示例值为占位示意）。
 
 ## 目标端
 
-- 目标端：iOS（SwiftUI）
-- 适配要点：hover 态无对应，用 pressed/长按替代；桌面端无底部 TabBar，主操作放页面内；毛玻璃面板用 `.ultraThinMaterial`。
+- 目标端 / 框架：<端 + 框架，取自 `docs/standards/tech-stack-rule.md` 的"选型上下文"（单端项目就一项）>
+
+> 端级适配**不写在这里**——统一住 `component-map-rule.md` 头部的 `## 端级纪律`（`slice-page.py` 会把它透传进每份映射切片）。本文件是平台无关清单。
 
 ## 基础组件
 
@@ -33,7 +34,7 @@
 - 数据：photo, name, area, distance, score, reviews, price, originalPrice?, scarcity?
 - 变体：hasOriginalPrice（可选字段式）/ hasScarcity（可选字段式）
 - 状态：默认 / 选中
-- 拼装：Card + Image + Text + Badge + Button
+- 拼装：Card + Avatar + Text + Badge + Button
 - token：bg={colors.surface} radius={rounded.lg} shadow={shadow.card}
 - 使用页面：page-02
 

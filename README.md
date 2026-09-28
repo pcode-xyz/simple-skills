@@ -41,7 +41,7 @@ claude plugin install simple@simple
 | --- | --- | --- |
 | `/simple:demo` | 产品思考梳理 + 风格化页面 demo（sense.md + HTML demo） | ✅ |
 | `/simple:specs-design` | 设计元素提取：按 design.md 规范从 demo 提取设计系统（色板/字体/字号/间距/圆角/阴影/组件）→ docs/specs/design/DESIGN.md | ✅ |
-| `/simple:specs-components` | 组件提取：demo 页面可复用视觉单元归类为规范组件 → docs/specs/design/COMPONENTS.md + component-map-rule.md（跨端组件映射表） | |
+| `/simple:specs-components` | 组件提取：demo 页面可复用视觉单元归类为规范组件 → docs/specs/design/COMPONENTS.md（平台无关清单）+ component-map-rule.md（按 tech-stack-rule 声明的端**裁剪**出的组件映射表） | ✅ |
 | `/simple:product-business` | 基于 sense.md + demo 原型稿，用四色建模法梳理业务流程（business-flow.md） | ✅ |
 | `/simple:product-glossary` | 统一语言词汇表：business-flow → glossary.md，subagent 逐页对比 demo，分歧/缺失处理 | ✅ |
 
@@ -92,10 +92,10 @@ claude plugin install simple@simple
 
 | 命令 | 说明 | 状态 |
 | --- | --- | --- |
-| `/simple:tdd` | 测试全绿修复：跑全量测试→逐失败修复（修代码不修测试）→重跑→直到全部通过 | |
-| `/simple:review` | 代码质量审查（只报告，不改代码）：接口维度（DB 效率/安全/错误处理/契约漂移）+ 全库维度（环调用/孤儿代码/硬编码）→ 分级写 docs/review/issues.md，P0 对话呈现 | |
-| `/simple:review-fix` | 按 issues.md 整改（执行型）：读 issues.md 与用户探讨范围/方案→登记任务（TaskCreate）顺序 subagent 修复→整体构建→归档 docs/review/ 到 archiving/{今日日期} | |
-| `/simple:docker` | Docker 容器化部署：生成 Dockerfile/compose/readme-docker.md，覆盖日志/资源/卷/环境/DB 初始化 | |
+| `/simple:tdd` | 测试全绿修复：跑全量测试→逐失败修复（修代码不修测试）→重跑→直到全部通过 | ✅ |
+| `/simple:review` | 代码质量审查（只报告，不改代码）：接口维度（DB 效率/安全/错误处理/契约漂移）+ 全库维度（环调用/孤儿代码/硬编码）→ 分级写 docs/review/issues.md，P0 对话呈现 | ✅ |
+| `/simple:review-fix` | 按 issues.md 整改（执行型）：读 issues.md 与用户探讨范围/方案→登记任务（TaskCreate）顺序 subagent 修复→整体构建→归档 docs/review/ 到 archiving/{今日日期} | ✅ |
+| `/simple:docker` | Docker 容器化部署：生成 Dockerfile/compose/readme-docker.md，覆盖日志/资源/卷/环境/DB 初始化 | ✅ |
 
 ## specs-api-mock 详解
 

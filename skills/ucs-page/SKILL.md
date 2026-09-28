@@ -1,6 +1,6 @@
 ---
 name: ucs-page
-description: 页面用例规约（Page UCS，仅写页面的端适用）。主进程跑确定性切片（slice-components.py）后，Workflow 逐页并行子 agent：读该页面 HTML + 组件切片 + 接口明细（HTTP → docs/specs/API，gRPC → docs/specs/grpc）+ page-ucs-template.md（组件名以 specs-components 的 COMPONENTS.md 规范组件为准，缺失回退 tech-stack-rule 组件库），生成页面公约直接写入 docs/specs/page-UCS/<页面>.md。当用户要做页面公约、页面用例规约、页面组件与交互设计时使用。
+description: 页面用例规约（Page UCS，仅写页面的端适用）。主进程跑确定性切片（slice-components.py）后，Workflow 逐页并行子 agent：读该页面 HTML + 组件切片 + 接口明细（HTTP → docs/specs/API，gRPC → docs/specs/grpc）+ page-ucs-template.md（组件名以 specs-components 的 COMPONENTS.md 规范组件为准，缺失按 tech-stack-rule 的 UI 组件库行取值），生成页面公约直接写入 docs/specs/page-UCS/<页面>.md。当用户要做页面公约、页面用例规约、页面组件与交互设计时使用。
 disable-model-invocation: true
 ---
 
@@ -17,13 +17,13 @@ disable-model-invocation: true
   - 两者皆无 → 接口明细缺失，提示先运行 `specs-api` 生成接口，结束；
   - 两者皆有 → 以 `docs/standards/tech-stack-rule.md` 选型上下文为准，或询问用户。
 - 必须存在：`docs/product/demo/`（≥1 个页面 HTML）、`docs/standards/tech-stack-rule.md`（含端/技术栈选型）。
-- 建议存在：`docs/specs/design/COMPONENTS.md`（规范组件清单，`specs-components` 产物；缺失时组件名回退为 tech-stack-rule 的组件库）、`docs/specs/design/DESIGN.md`（设计 token）、`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/product/business-flow.md`。
+- 建议存在：`docs/specs/design/COMPONENTS.md`（规范组件清单，`specs-components` 产物；缺失时组件名按 tech-stack-rule 的 UI 组件库行取值）、`docs/specs/design/DESIGN.md`（设计 token）、`docs/standards/directory-rule.md`、`docs/standards/tools-rule.md`、`docs/product/business-flow.md`。
 - 缺失必选项时，提示先运行对应 skill，结束。
 
 ## 模板文件（本 skill 自带）
 
 - `templates/page-ucs-template.md` → 页面公约模板（Glob 定位 `**/skills/ucs-page/templates/page-ucs-template.md`，不硬编码缓存路径）
-- 组件名取值：优先本页组件切片（`docs/specs/design/.slice/<页面>.md`，由 COMPONENTS.md 确定性过滤派生，见 Step 3）；无切片时回退 `tech-stack-rule.md` 的组件库（替换模板 `{组件库}` 占位，如 Element Plus / Ant Design / TDesign / uni-ui / 自定义组件）
+- 组件名取值：优先本页组件切片（`docs/specs/design/.slice/<页面>.md`，由 COMPONENTS.md 确定性过滤派生，见 Step 3）；无切片时按 `tech-stack-rule.md` 的 **UI 组件库行**取值填 `{组件库}` 占位——该行可能是具体组件库名，也可能是"不引第三方组件库 / core 自建"，**不要预设为某个库**
 
 ## Step 1 — 读 spec 提取确定清单
 
